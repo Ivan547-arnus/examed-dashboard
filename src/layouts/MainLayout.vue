@@ -11,14 +11,14 @@
         <q-space></q-space>
         <q-btn padding="xs sm" v-bind="$theme.btn" no-caps flat color="primary">
           <q-item-section class="q-mr-sm">
-            <q-item-label>¡Hola Ivan!</q-item-label>
+            <q-item-label>¡Hola {{ auth.user?.name }}!</q-item-label>
           </q-item-section>
           <q-avatar v-bind="$theme.avatar">
             <q-img no-spinner src="~assets/logo.webp" fit="contain"></q-img>
           </q-avatar>
           <q-menu v-bind="$theme.menu">
             <q-list style="min-width: 180px;" class="border-md-radius">
-              <q-item clickable v-ripple>
+              <q-item :to="`/usuarios/editar/${auth.user?.id}`" clickable v-ripple>
                 <q-item-section avatar>
                   <q-avatar v-bind="$theme.avatar" color="accent">
                     <q-icon name="person" color="primary"></q-icon>
@@ -26,7 +26,7 @@
                 </q-item-section>
                 <q-item-section>Mi cuenta</q-item-section>
               </q-item>
-              <q-item clickable v-ripple>
+              <q-item clickable v-ripple @click="handleLogout">
                 <q-item-section avatar>
                   <q-avatar v-bind="$theme.avatar" color="red-1">
                     <q-icon name="logout" color="negative"></q-icon>
@@ -67,7 +67,10 @@
 
 <script lang="ts" setup>
 import { useMeta } from 'quasar';
+import { theme } from 'src/boot/helpers';
 import EssentialLink from 'src/components/EssentialLink.vue';
+import { question } from 'src/config/dialog';
+import { useAuth } from 'src/stores/auth-store';
 import { computed, ref } from 'vue';
 import { useRouter } from 'vue-router';
 const router = useRouter()
@@ -75,6 +78,7 @@ const title = computed(() => 'Kaptari | Dashboard | ' + (router.currentRoute.val
 useMeta(() => ({
   title: title.value,
 }))
+const auth = useAuth()
 const menuDrawer = ref(false)
 const menu = [
   {
@@ -93,6 +97,13 @@ const menu = [
     to: '/kapties'
   },
 ]
+
+async function handleLogout() {
+  const answer = await question('Sesión', '¿Desea cerrar sesión?', { type: 'negative', ok: { ...theme.btn, label: 'Cerrar sesión', color: 'negative' } });
+  if (!answer) return;
+  auth.logout();
+  void router.push('/auth');
+}
 </script>
 
 

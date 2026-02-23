@@ -13,9 +13,10 @@ export default defineConfig((/* ctx */) => {
     // --> boot files are part of "main.js"
     // https://v2.quasar.dev/quasar-cli-vite/boot-files
     boot: [
+      '~quasar-app-extension-vuelidate-rules/src/boot/register-vuelidate-rules',
       'axios',
+      'auth',
       'helpers',
-      '~quasar-app-extension-vuelidate-rules/src/boot/register-vuelidate-rules'
     ],
 
     // https://v2.quasar.dev/quasar-cli-vite/quasar-config-file#css
@@ -93,7 +94,7 @@ export default defineConfig((/* ctx */) => {
       config: {},
 
       // iconSet: 'material-icons', // Quasar icon set
-      // lang: 'en-US', // Quasar language pack
+      lang: 'es', // Quasar language pack
 
       // For special cases outside of where the auto-import strategy can have an impact
       // (like functional components as one of the examples),
@@ -103,12 +104,12 @@ export default defineConfig((/* ctx */) => {
       // directives: [],
 
       // Quasar plugins
-      plugins: ['Meta', 'LoadingBar', 'Dialog']
+      plugins: ['Meta', 'LoadingBar', 'Dialog', 'LocalStorage']
     },
 
     // animations: 'all', // --- includes all animations
     // https://v2.quasar.dev/options/animations
-    animations: [],
+    animations: ['fadeInRight', 'fadeOutLeft'],
 
     // https://v2.quasar.dev/quasar-cli-vite/quasar-config-file#sourcefiles
     // sourceFiles: {

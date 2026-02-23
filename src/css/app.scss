@@ -124,3 +124,7 @@ body {
 .q-field--standout.q-field--highlighted .q-field__control {
     background-color: $grey-3 !important;
 }
+
+.q-field--standout.q-field--highlighted .q-field__native, .q-field--standout.q-field--highlighted .q-field__prefix, .q-field--standout.q-field--highlighted .q-field__suffix, .q-field--standout.q-field--highlighted .q-field__prepend, .q-field--standout.q-field--highlighted .q-field__append, .q-field--standout.q-field--highlighted .q-field__input {
+    color: $primary !important;
+}

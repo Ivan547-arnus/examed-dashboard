@@ -23,6 +23,7 @@ const theme = {
     transitionHide: "flip-left",
   },
   input: {
+    class: "text-primary",
     inputClass: "text-primary",
     standout: "bg-grey-3 text-primary",
   },
