@@ -1,5 +1,5 @@
 <template>
-  <q-layout view="lHh LpR lFf" class="bg-grey-1">
+  <q-layout view="lHh LpR lFf" class="bg-grey-2">
     <q-header class="bg-accent" height-hint="98">
       <q-toolbar style="height: 60px;">
         <q-btn v-bind="$theme.btnIcon" color="primary" text-color="accent" @click="menuDrawer = !menuDrawer">
@@ -59,7 +59,7 @@
       </div>
     </q-drawer>
 
-    <q-page-container class="bg-grey-11 border-md-radius">
+    <q-page-container class="bg-grey-12 border-md-radius">
       <router-view />
     </q-page-container>
   </q-layout>

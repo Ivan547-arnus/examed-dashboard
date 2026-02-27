@@ -23,7 +23,8 @@
           <q-tr :props="props">
             <q-td key="marker" :props="props">
               <div>
-                <img no-spinner style="max-height: 60px;" class="border-md-radius" :src="$filters.imageUrl(props.row.marker_uuid)" />
+                <q-img v-if="props.row.marker_uuid" no-spinner style="max-height: 60px; max-width: 60px" fit="cover" class="border-md-radius" :src="$filters.imageUrl(props.row.marker_uuid)" />
+                <q-icon v-else name="bi-image" color="grey-4" size="md"></q-icon>
               </div>
             </q-td>
             <q-td key="title" :props="props" class="be-vietnam-pro-bold">

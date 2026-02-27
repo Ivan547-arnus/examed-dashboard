@@ -11,10 +11,8 @@
         <q-form class="row q-col-gutter-md" id="kaptie-form" @submit.prevent="onSubmit">
           <div class="col-12 col-md-4">
             <div class="row q-col-gutter-md">
-              <div :class="{
-                'col-12 col-sm-8 col-md-12': state.qr_code,
-                'col-12': !state.qr_code
-              }"><q-card v-bind="$theme.card">
+              <div class="col-12">
+                <q-card v-bind="$theme.card">
                   <q-card-section>
                     <p class="text-h4 text-primary q-my-none">Información general del kaptie</p>
                     <q-input v-bind="$theme.input" :rules="[$rules.required('Campo requerido')]" label="Título"
@@ -25,16 +23,20 @@
                   </q-card-section>
                 </q-card>
               </div>
-              <div class="col-12 col-sm-4 col-md-12" v-if="state.qr_code">
-                <div class="column">
-                  <q-btn v-bind="$theme.btn" color="primary" text-color="secondary"
-                    icon="bi-arrow-clockwise" @click="handleRegenerateQR" label="Regenerar QR"></q-btn>
-                  <q-btn v-bind="$theme.btn" class="q-mt-md" color="accent" text-color="primary" label="Abrir QR"
-                    icon="bi-box-arrow-up-right" :href="$filters.imageUrl(state.qr_code.uuid)" target="_blank"></q-btn>
-                </div>
-                <q-card class="q-mt-md" v-bind="$theme.card">
-                  <q-img class="col-12" no-spinner :src="$filters.imageUrl(state.qr_code.uuid)" />
-                </q-card>
+              <div class="col-12" v-if="state.qr_code">
+                <q-expansion-item header-class="border-md-radius" v-model="expanded" icon="bi-qr-code"
+                  label="Información del QR">
+                  <div class="column q-mt-md">
+                    <q-btn v-bind="$theme.btn" color="primary" text-color="secondary" icon="bi-arrow-clockwise"
+                      @click="handleRegenerateQR" label="Regenerar QR"></q-btn>
+                    <q-btn v-bind="$theme.btn" class="q-mt-md" color="accent" text-color="primary" label="Abrir QR"
+                      icon="bi-box-arrow-up-right" :href="$filters.imageUrl(state.qr_code.uuid)"
+                      target="_blank"></q-btn>
+                  </div>
+                  <q-card class="q-mt-md" v-bind="$theme.card">
+                    <q-img class="col-12" no-spinner :src="$filters.imageUrl(state.qr_code.uuid)" />
+                  </q-card>
+                </q-expansion-item>
               </div>
             </div>
           </div>
@@ -65,8 +67,7 @@
                         <q-item-label caption>Imagen de portada</q-item-label>
                       </q-item-section>
                     </q-item>
-                    <q-field borderless no-error-icon v-model="state.marker"
-                      :rules="[$rules.required('Campo requerido')]">
+                    <q-field borderless no-error-icon v-model="state.marker">
                       <template #control>
                         <q-upload-component file-icon="bi-file-image" accept="image/*"
                           v-model="state.marker"></q-upload-component>
@@ -79,8 +80,7 @@
                         <q-item-label caption>Zip de kaptie</q-item-label>
                       </q-item-section>
                     </q-item>
-                    <q-field borderless no-error-icon v-model="state.zip_file"
-                      :rules="[$rules.required('Campo requerido')]">
+                    <q-field borderless no-error-icon v-model="state.zip_file">
                       <template #control>
                         <q-upload-component file-icon="bi-file-zip" v-model="state.zip_file"
                           accept="application/x-zip, application/zip, application/octet-stream, application/x-zip-compressed"></q-upload-component>
@@ -108,6 +108,7 @@ import { onMounted, ref } from 'vue';
 import { useRouter } from 'vue-router';
 const router = useRouter()
 const state = ref<Kaptie>(new Kaptie)
+const expanded = ref(false)
 async function onSubmit() {
   const answer = await question('Guardar', 'El Kaptie se guardará con los datos ingresados', { type: 'info', ok: { ...theme.btn, label: 'Guardar', color: 'primary', textColor: 'secondary' } })
   if (!answer) return

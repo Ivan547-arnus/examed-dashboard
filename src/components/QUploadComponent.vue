@@ -45,7 +45,7 @@
 </template>
 
 <script lang="ts" setup>
-import type { QUploader, QUploaderProps } from 'quasar';
+import { LocalStorage, type QUploader, type QUploaderProps } from 'quasar';
 import type { IFile } from 'src/types/IFile';
 import { computed, ref } from 'vue';
 const uploader = ref<QUploader | null>(null);
@@ -57,7 +57,12 @@ function handleUpload() {
     url: process.env.API_URL + '/uploads',
     method: 'POST',
     fieldName: 'file',
-
+      headers: [
+        {
+          name: 'Authorization',
+          value: 'Bearer ' + (LocalStorage.getItem('token') as string),
+        },
+    ],
   };
 };
 
