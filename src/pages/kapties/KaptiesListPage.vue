@@ -10,7 +10,7 @@
         Kaptie</q-btn>
     </div>
     <q-card class="bg-transparent no-shadow" style="width: 100%;">
-      <q-table-component url="/kapties" :search="search" table-header-class="text-h6" style="width: 100%;" :columns="columns"
+      <q-table-component ref="table" url="/kapties" :search="search" table-header-class="text-h6" style="width: 100%;" :columns="columns"
         class="bg-transparent no-shadow">
         <template #no-data>
           <div class="no-items text-primary">
@@ -72,6 +72,7 @@ import QTableComponent from 'src/components/QTableComponent.vue';
 import { alert, question } from 'src/config/dialog';
 import { ref } from 'vue';
 const search = ref('')
+const table = ref<{ refresh: () => void } | null>(null);
 const columns = [
   {
     name: 'marker',
@@ -138,6 +139,9 @@ async function handleDelete(id: string) {
     }
   } = await make(`kapties/${id}`, 'DELETE');
   void alert(error ? 'Eliminado': 'Error al eliminar', message)
+  if(!error) {
+    table.value?.refresh();
+  }
 }
 </script>
 

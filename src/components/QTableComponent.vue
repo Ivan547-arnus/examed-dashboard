@@ -1,6 +1,6 @@
 <template>
   <!-- @vue-ignore -->
-  <q-table ref="table" v-bind="$props" :rows="rows" :loading="loading" v-model:pagination="pagination" v-touch-pan.prevent.mouse="handlePan" @request="handleTableRequest">
+  <q-table ref="table" v-bind="$props" :rows="rows" :loading="loading" v-model:pagination="pagination" @request="handleTableRequest">
     <!-- @vue-skip -->
     <template v-for="(_, slot) of $slots" v-slot:[slot]="scope">
       <slot :name="slot" v-bind="scope" />
@@ -51,7 +51,6 @@ import { debounce, type QTableProps, type QTableSlots } from 'quasar';
 import { make } from 'src/boot/axios';
 import { computed, nextTick, onMounted, ref, watch } from 'vue';
 const loading = ref(false)
-const topScrollbar = ref<HTMLElement | null>(null);
 const table = ref(null);
 const props = withDefaults(defineProps<Props>(), {});
 const search = defineModel<string>('search');
@@ -70,19 +69,6 @@ const range = computed(() => ({
   max: Math.ceil(pagination.value.rowsNumber / pagination.value.rowsPerPage)
 }))
 
-function handlePan(event: { delta: { x: number; y: number }; duration: number }) {
-  const { duration } = event;
-  if (duration < 100) return;
-  // @ts-expect-error no type found
-  const tableBody = table.value?.$el.querySelector('.q-table__middle.scroll');
-  if (topScrollbar.value) {
-    topScrollbar.value.scrollLeft -= event.delta.x;
-  }
-
-  if (tableBody) {
-    tableBody.scrollLeft -= event.delta.x
-  }
-};
 
 
 async function handleTableRequest(val:{pagination:{ page: number; rowsPerPage: number; sortBy: string; descending: boolean }}) {
@@ -134,6 +120,10 @@ watch(() => search.value, debounce(handleRequest, 500))
 
 onMounted(async () => {
   await handleRequest()
+})
+
+defineExpose({
+  refresh: handleRequest
 })
 </script>
 
