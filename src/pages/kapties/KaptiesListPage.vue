@@ -1,7 +1,8 @@
 <template>
   <q-page padding class="container">
     <div class="flex q-gutter-md">
-      <q-input v-bind="$theme.input" style="width: 280px;" v-model="search" label="Buscar..." dense clearable clear-icon="bi-x">
+      <q-input v-bind="$theme.input" style="width: 280px;" v-model="search" label="Buscar..." dense clearable
+        clear-icon="bi-x">
         <template #append>
           <q-icon name="bi-search"></q-icon>
         </template>
@@ -10,55 +11,60 @@
         Kaptie</q-btn>
     </div>
     <q-card class="bg-transparent no-shadow" style="width: 100%;">
-      <q-table-component ref="table" url="/kapties" :search="search" table-header-class="text-h6" style="width: 100%;" :columns="columns"
-        class="bg-transparent no-shadow">
+      <q-table-component ref="table" row-key="id" url="/kapties" :search="search" table-header-class="text-h6"
+        style="width: 100%;" :columns="columns" class="bg-transparent no-shadow kapties-table" grid hide-header>
         <template #no-data>
           <div class="no-items text-primary">
+            <q-icon color="grey-6" name="bi-exclamation-triangle" size="120px"></q-icon>
             <span class="text-h4">Aun no tienes kapties</span>
             <q-btn v-bind="$theme.btn" to="/kapties/nuevo" icon="bi-plus" color="primary" text-color="secondary">Crear
               Kaptie</q-btn>
           </div>
         </template>
-        <template #body="props">
-          <q-tr :props="props">
-            <q-td key="marker" :props="props">
-              <div>
-                <q-img v-if="props.row.marker_uuid" no-spinner style="max-height: 60px; max-width: 60px" fit="cover" class="border-md-radius" :src="$filters.imageUrl(props.row.marker_uuid)" />
-                <q-icon v-else name="bi-image" color="grey-4" size="md"></q-icon>
+        <template #item="props">
+          <div class="q-pa-sm col-12 col-sm-6 col-md-4 col-xl-3">
+            <q-card class="kaptie-card">
+              <div v-if="props.row.marker_uuid" class="kaptie-card__media">
+                <q-img no-spinner fit="contain" class="kaptie-card__image"
+                  :src="$filters.imageUrl(props.row.marker_uuid)" />
               </div>
-            </q-td>
-            <q-td key="title" :props="props" class="be-vietnam-pro-bold">
-              <div>
-                {{ props.row.title }}
+              <div v-else class="kaptie-card__media kaptie-card__media--placeholder">
+                <q-icon name="bi-image" color="grey-5" size="48px"></q-icon>
               </div>
-            </q-td>
-            <q-td key="description" :props="props">
-              <div>
-                {{ props.row.description }}
-              </div>
-            </q-td>
-            <q-td key="status" :props="props">
-              <div>
-                <q-chip v-if="props.row.status == 'draft'" class="be-vietnam-pro-bold" color="grey-4" text-color="dark">
-                  Borrador
-                </q-chip>
-              </div>
-            </q-td>
-            <q-td key="created_at" :props="props">
-              <div>
-                {{ $filters.dateTime(props.row.created_at) }}
-              </div>
-            </q-td>
-            <q-td key="actions" :props="props">
-              <div class="flex justify-center">
+
+              <q-card-section class="q-pb-sm">
+                <div class="flex justify-between items-center q-gutter-sm">
+                  <div class="text-h5 text-primary kaptie-card__title">
+                    {{ props.row.title }}
+                  </div>
+                  <q-select v-bind="$theme.input" v-model="props.row.status" @update:model-value="(value) => handleChangeStatus(props.row, value)" :options="statusOptions" emit-value
+                    map-options dense class="kaptie-card__status" />
+                </div>
+
+                <p class="kaptie-card__description text-normal text-primary q-mt-sm q-mb-md">
+                  {{ props.row.description || 'Sin descripción' }}
+                </p>
+                <p class="text-normal text-primary q-my-none">
+                  Visitado: 0
+                </p>
+
+                <div class="text-caption text-grey-7">
+                  Creado: {{ $filters.dateTime(props.row.created_at) }}
+                </div>
+              </q-card-section>
+
+              <q-separator></q-separator>
+
+              <q-card-actions align="between" class="kaptie-card__actions">
                 <q-btn v-bind="$theme.btnIcon" icon="bi-qr-code" color="primary" text-color="secondary"
                   :href="$filters.imageUrl(props.row.qr_code.uuid)" target="_blank"></q-btn>
                 <q-btn v-bind="$theme.btnIcon" icon="bi-pencil-square" color="primary" text-color="secondary"
                   :to="`/kapties/editar/${props.row.id}`"></q-btn>
-                <q-btn v-bind="$theme.btnIcon" @click="handleDelete(props.row.id)" icon="bi-trash" color="negative" text-color="white"></q-btn>
-              </div>
-            </q-td>
-          </q-tr>
+                <q-btn v-bind="$theme.btnIcon" @click="handleDelete(props.row.id)" icon="bi-trash" color="negative"
+                  text-color="white"></q-btn>
+              </q-card-actions>
+            </q-card>
+          </div>
         </template>
       </q-table-component>
     </q-card>
@@ -66,13 +72,19 @@
 </template>
 
 <script setup lang="ts">
+import { Notify } from 'quasar';
 import { make } from 'src/boot/axios';
 import { theme } from 'src/boot/helpers';
 import QTableComponent from 'src/components/QTableComponent.vue';
 import { alert, question } from 'src/config/dialog';
+import type { IKaptie } from 'src/types/IKaptie';
 import { ref } from 'vue';
 const search = ref('')
 const table = ref<{ refresh: () => void } | null>(null);
+const statusOptions = [
+  { label: 'Borrador', value: 'draft' },
+  { label: 'Publicado', value: 'published' }
+];
 const columns = [
   {
     name: 'marker',
@@ -121,9 +133,27 @@ const columns = [
   },
 ];
 
+async function handleChangeStatus(row: IKaptie, value:string) {
+  const {
+    data: {
+      error,
+      message
+    }
+  } = await make(`kapties/${row.id}/change-status`, 'PUT', { status: value });
+  if (error) {
+    void alert(!error ? 'Actualizado' : 'Error al actualizar', message)
+  } else {
+    Notify.create({
+      type: 'positive',
+      message,
+      classes: 'border-md-radius'
+    });
+  }
+}
+
 async function handleDelete(id: string) {
   const answer = await question('¿Eliminar kaptie?', 'El Kaptie se eliminara permanentemente', {
-    type:'negative',
+    type: 'negative',
     icon: 'bi-exclamation-circle',
     ok: {
       ...theme.btn,
@@ -131,15 +161,15 @@ async function handleDelete(id: string) {
       color: 'negative',
     }
   });
-  if(!answer) return;
+  if (!answer) return;
   const {
     data: {
       error,
       message
     }
   } = await make(`kapties/${id}`, 'DELETE');
-  void alert(error ? 'Eliminado': 'Error al eliminar', message)
-  if(!error) {
+  void alert(error ? 'Eliminado' : 'Error al eliminar', message)
+  if (!error) {
     table.value?.refresh();
   }
 }
@@ -180,6 +210,53 @@ async function handleDelete(id: string) {
   justify-content: center;
   align-items: center;
   cursor: pointer;
+  min-height: 620px;
+}
+
+.kaptie-card {
+  height: 100%;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 12px 30px rgba(14, 52, 90, 0.08);
+}
+
+.kaptie-card__media {
+  height: 180px;
+  background-color: $grey-2;
+}
+
+.kaptie-card__media--placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.kaptie-card__image {
+  width: 100%;
+  height: 100%;
+}
+
+.kaptie-card__title {
+  flex: 1;
+  line-height: 1.2;
+}
+
+.kaptie-card__status {
+  min-width: 140px;
+}
+
+.kaptie-card__description {
+  min-height: 66px;
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+}
+
+.kaptie-card__actions {
+  padding: 12px 16px 16px;
+  justify-content: flex-end;
+  gap: 8px;
 }
 
 @media (max-width: $breakpoint-sm-min) {
@@ -191,6 +268,10 @@ async function handleDelete(id: string) {
   .new-item {
     width: 100%;
     max-width: unset;
+  }
+
+  .kaptie-card__media {
+    height: 160px;
   }
 }
 </style>
