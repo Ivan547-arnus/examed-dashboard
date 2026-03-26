@@ -11,38 +11,6 @@ const routes: RouteRecordRaw[] = [
     children: [{ path: "", component: () => import("pages/IndexPage.vue") }],
   },
   {
-    path: "/kapties",
-    meta: {
-      title: "Kapties",
-      auth: true,
-    },
-    component: () => import("layouts/MainLayout.vue"),
-    children: [
-      {
-        path: "",
-        component: () => import("pages/kapties/KaptiesListPage.vue"),
-      },
-      {
-        path: "nuevo",
-        name: "Nuevo Kaptie",
-        meta: {
-          title: "Kaptie",
-          auth: true,
-        },
-        component: () => import("pages/kapties/KaptieFormPage.vue"),
-      },
-      {
-        path: "editar/:id",
-        name: "Editar Kaptie",
-        meta: {
-          title: "Kaptie",
-          auth: true,
-        },
-        component: () => import("pages/kapties/KaptieFormPage.vue"),
-      },
-    ],
-  },
-   {
     path: "/usuarios",
     meta: {
       title: "Usuarios",
@@ -75,8 +43,8 @@ const routes: RouteRecordRaw[] = [
           auth: true,
         },
         component: () => import("pages/usuarios/UsuarioFormPage.vue"),
-      }
-    ]
+      },
+    ],
   },
   {
     path: "/auth",
