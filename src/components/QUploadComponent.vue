@@ -1,13 +1,13 @@
 <template>
   <!-- @vue-ignore -->
   <q-uploader v-bind="$props" ref="uploader" :factory="handleUpload" auto-upload @removed="handleRemoved"
-    @uploaded="handleUploaded" :max-files="1" class="q-uploader border-md-radius no-shadow">
+    @uploaded="handleUploaded" :max-files="1" class="q-uploader border-xs-radius no-shadow">
     <template #header>
     </template>
     <template #list="scope">
       <div class="q-uploader-container" :class="`bg-${$props.color || 'white'}`">
         <div class="q-uploader-card text-normal" v-if="scope.files.length || model?.id">
-          <img  :src="fileRoute" v-if="isImage && fileRoute" class="border-md-radius"
+          <img  :src="fileRoute" v-if="isImage && fileRoute" class="border-xs-radius"
             style="max-height: 60px;" />
 
           <q-icon :name="$props.fileIcon || 'bi-file-earmark'" color="primary" size="xl" v-else></q-icon>

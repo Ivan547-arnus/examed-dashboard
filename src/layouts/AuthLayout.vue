@@ -1,8 +1,7 @@
 <template>
-  <q-layout view="lHh LpR lFf" class="bg-primary">
-    <q-page-container class="bg-primary border-md-radius">
+  <q-layout view="lHh LpR lFf" class="bg-grey-2">
+    <q-page-container class="bg-grey-12 border-xs-radius">
       <q-page class="auth-container">
-        <q-img class="auth-logo" no-spinner src="~assets/logo-principal-horizontal.svg" fit="contain"></q-img>
         <div class="auth-form">
           <router-view v-slot="{ Component }">
             <transition enter-active-class="animated fadeInRight" leave-active-class="animated fadeOutLeft" mode="out-in">
@@ -20,7 +19,7 @@ import { useMeta } from 'quasar';
 import { computed } from 'vue';
 import { useRouter } from 'vue-router';
 const router = useRouter()
-const title = computed(() => 'Kaptari | Dashboard | ' + (router.currentRoute.value.meta.title as string))
+const title = computed(() => 'Example | Dashboard | ' + (router.currentRoute.value.meta.title as string))
 useMeta(() => ({
   title: title.value,
 }))
@@ -34,23 +33,6 @@ useMeta(() => ({
   align-items: center;
   width: 100%;
   height: 100%;
-
-
-  &::before {
-    content: "";
-    z-index: 0;
-    background-image: url(/src/assets/menu-bg.webp);
-    width: 210%;
-    height: 120%;
-    position: fixed;
-    bottom: 0;
-    background-size: contain;
-    background-repeat: no-repeat;
-    background-position: center bottom;
-    opacity: .25;
-    bottom: -15%;
-    left: -72.5%;
-  }
 }
 
 .auth-logo {

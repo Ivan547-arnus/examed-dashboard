@@ -1,30 +1,38 @@
 <template>
   <q-dialog ref="dialogRef" @hide="onDialogHide" persistent>
-    <q-card
-      :style="{ maxWidth: $props.maxWidth ? $props.maxWidth + 'px' : '320px', 'min-width': '220px', 'border-radius': '12px !important' }">
-      <q-card-section class="row q-py-sm justify-between items-center" :class="`bg-${color}-1 text-${color}-9`">
-        <span class="text-h4 text-left">{{ $props.title }} </span>
-        <q-btn icon="close" flat round dense v-close-popup />
-      </q-card-section>
+    <q-card v-bind="$theme.card" :style="{ maxWidth: $props.maxWidth ? $props.maxWidth + 'px' : '420px', 'min-width': '320px' }">
+      <q-item class="full-width" :class="`bg-${color}-9`">
+        <q-item-section avatar v-if="typeof $props.icon === 'string'">
+          <q-avatar :color="`bg-${color}-9`" size="36px">
+            <q-icon :name="$props.icon" :color="`white`" size="1.8em"></q-icon>
+          </q-avatar>
+        </q-item-section>
+        <q-item-section>
+          <q-item-label class="text-h4" :class="`text-white`">
+            {{ $props.title }}
+          </q-item-label>
+        </q-item-section>
+        <q-item-section side>
+          <q-btn icon="close" flat round dense v-close-popup :color="`white`" />
+        </q-item-section>
+      </q-item>
+      <q-separator :color="`${color}-2`"></q-separator>
       <q-card-section>
-        <q-item>
-          <q-item-section avatar v-if="typeof $props.icon === 'string'">
-            <q-avatar :color="`${color}-1`">
-              <q-icon :name="$props.icon" :color="`${color}-9`"></q-icon>
-            </q-avatar>
-          </q-item-section>
+        <q-item class="q-px-none">
           <q-item-section>
-            <q-item-label class="text-normal">
-              {{ $props.message }}
+            <q-item-label>
+              <span v-html="$props.message"></span>
             </q-item-label>
           </q-item-section>
         </q-item>
       </q-card-section>
-      <q-separator></q-separator>
-      <q-card-actions class="action-buttons" :class="{ 'reverse': $props.reverseActions }">
-        <q-btn v-if="$props.cancel && typeof $props.cancel === 'object'" v-bind="$props.cancel"
-          @click="onDialogCancel" />
-        <q-btn v-if="$props.ok && typeof $props.ok === 'object'" v-bind="$props.ok" @click="onDialogOK" />
+      <q-separator :color="`grey-3`"></q-separator>
+      <q-card-actions class="action-buttons" :class="$props.reverseActions ? `reverse bg-white` : `bg-white`">
+        <q-btn v-if="$props.cancel && typeof $props.cancel === 'object'" v-bind="{...$theme.btn, ...$props.cancel}" @click="onDialogCancel"
+          class="full-width" />
+        <div v-else></div>
+        <q-btn v-if="$props.ok && typeof $props.ok === 'object'" v-bind="{...$theme.btn, ...$props.ok}" @click="onDialogOK"
+          class="full-width" />
       </q-card-actions>
     </q-card>
   </q-dialog>
@@ -71,8 +79,10 @@ const color = computed(() => {
 <style lang="scss" scoped>
 .action-buttons {
   display: grid;
-  grid-template-columns: auto auto;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
   justify-self: end;
+  width: 100%;
 
   &.reverse {
     direction: rtl;

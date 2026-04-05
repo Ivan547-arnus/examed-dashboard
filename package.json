@@ -1,8 +1,8 @@
 {
-  "name": "kaptari-dashboard",
+  "name": "examed-dashboard",
   "version": "0.0.1",
-  "description": "A kaptari dashboar",
-  "productName": "Kaptari | Dashboard",
+  "description": "An Examed Dashboard",
+  "productName": "Examed | Dashboard",
   "author": "Ivan Villegas Rojas <villegas.rojas.ivan@gmail.com>",
   "type": "module",
   "private": true,

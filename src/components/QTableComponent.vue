@@ -1,33 +1,32 @@
 <template>
   <!-- @vue-ignore -->
-  <q-table ref="table" v-bind="$props" :rows="rows" :loading="loading" v-model:pagination="pagination" @request="handleTableRequest">
+  <q-table ref="table" v-bind="$props" :rows="rows" :loading="loading" v-model:pagination="pagination"
+    @request="handleTableRequest">
     <!-- @vue-skip -->
     <template v-for="(_, slot) of $slots" v-slot:[slot]="scope">
       <slot :name="slot" v-bind="scope" />
     </template>
     <template #bottom>
-      <div class="full-width flex justify-end q-gutter-sm q-mt-xs">
-        <q-btn v-bind="$theme.btn" color="primary" text-color="secondary"
+      <div class="full-width flex justify-end q-gutter-sm q-my-sm">
+        <q-btn v-bind="$theme.btn" color="primary" text-color="white"
           :label="`Registros por pagina: ${pagination.rowsPerPage}`" icon-right="bi-arrow-down-short">
           <q-menu v-bind="$theme.menu" anchor="bottom right" self="top right">
             <q-list>
-              <q-item v-for="item in [10, 25, 50, 100]" clickable v-close-popup
-                @click="pagination.rowsPerPage = item;" :key="item"
-                class="be-vietnam-pro-bold">
+              <q-item v-for="item in [5, 7, 10, 25, 50, 100]" clickable v-close-popup @click="() =>  { pagination.rowsPerPage = item; handleRequest(); }"
+                :key="item" class="be-vietnam-pro-bold">
                 <q-item-section>{{ item }}</q-item-section>
               </q-item>
             </q-list>
           </q-menu>
         </q-btn>
-        <q-btn v-bind="$theme.btnIcon" :disabled="pagination.page == 1" dense color="primary" text-color="secondary"
-          icon="bi-arrow-left-short" @click="() => { pagination.page--; handleRequest(); }"></q-btn>
-        <q-pagination size="md" push active-design="push" v-model="pagination.page" @update:model-value="handleRequest" color="white" active-color="primary"
-          active-text-color="secondary" text-color="dark" :min="range.min" :max="range.max" />
-        <q-btn v-bind="$theme.btnIcon" :disabled="pagination.page == range.max" dense color="primary"
-          text-color="secondary" icon="bi-arrow-right-short"
-          @click="() => { pagination.page++; handleRequest(); }"></q-btn>
-        <q-btn v-bind="$theme.btnIcon" @click="handleRequest" dense text-color="secondary" color="primary"
-          icon="bi-arrow-clockwise">
+        <q-btn v-bind="$theme.btnIcon" :disabled="pagination.page == 1" dense color="primary" text-color="white"
+          icon="sym_o_arrow_left" @click="() => { pagination.page--; handleRequest(); }"></q-btn>
+        <q-pagination rounded size="16px" v-model="pagination.page" @update:model-value="handleRequest" color="primary"
+          active-color="primary" active-text-color="white" text-color="primary" :min="range.min" :max="range.max" />
+        <q-btn v-bind="$theme.btnIcon" :disabled="pagination.page == range.max" dense color="primary" text-color="white"
+          icon="sym_o_arrow_right" @click="() => { pagination.page++; handleRequest(); }"></q-btn>
+        <q-btn v-bind="$theme.btnIcon" @click="handleRequest" dense text-color="white" color="primary"
+          icon="sym_o_refresh">
         </q-btn>
       </div>
     </template>
@@ -50,20 +49,23 @@ interface Props extends Omit<QTableProps, 'rows'> {
 import { debounce, type QTableProps, type QTableSlots } from 'quasar';
 import { make } from 'src/boot/axios';
 import { computed, nextTick, onMounted, ref, watch } from 'vue';
-const loading = ref(false)
-const table = ref(null);
 const props = withDefaults(defineProps<Props>(), {});
 const search = defineModel<string>('search');
+const loading = defineModel<boolean>('loading');
 defineSlots<QTableSlots>()
 const rows = ref([]);
-const pagination = ref({
-  sortBy: null as null | string,
-  descending: false,
-  page: 1,
-  rowsPerPage: 10,
-  rowsNumber: 0
+const pagination = defineModel<{ page: number; rowsPerPage: number; sortBy: null | string; descending: boolean; rowsNumber: number }>('pagination', {
+  default: {
+    page: 1,
+    rowsPerPage: 10,
+    sortBy: null,
+    descending: false,
+    rowsNumber: 0
+  }
 });
-
+const searchFields = computed(() => {
+  return props.columns?.filter((column) => column.searchable === true).map((column) => column.name)
+});
 const range = computed(() => ({
   min: pagination.value.page == 1 ? 1 : Math.max((Math.ceil(pagination.value.rowsNumber / pagination.value.rowsPerPage)) - 5, 1),
   max: Math.ceil(pagination.value.rowsNumber / pagination.value.rowsPerPage)
@@ -71,9 +73,11 @@ const range = computed(() => ({
 
 
 
-async function handleTableRequest(val:{pagination:{ page: number; rowsPerPage: number; sortBy: string; descending: boolean }}) {
+async function handleTableRequest(val: { pagination: { page: number; rowsPerPage: number; sortBy: string; descending: boolean } }) {
   pagination.value.sortBy = val.pagination.sortBy;
   pagination.value.descending = val.pagination.descending;
+  pagination.value.page = val.pagination.page;
+  pagination.value.rowsPerPage = val.pagination.rowsPerPage;
   await nextTick()
   void handleRequest();
 }
@@ -87,6 +91,7 @@ async function handleRequest() {
     } = await make<{ data: [], total: number, current_page: number }>(props.url, 'GET', {
       ...props.requestData,
       search: search.value,
+      searchFields: searchFields.value,
       rowsPerPage: pagination.value.rowsPerPage,
       page: pagination.value.page,
       sortBy: pagination.value.sortBy,
@@ -112,10 +117,6 @@ async function handleRequest() {
   }
 }
 
-watch(() => pagination.value.rowsPerPage, () => {
-  void handleRequest()
-})
-
 watch(() => search.value, debounce(handleRequest, 500))
 
 onMounted(async () => {
@@ -127,18 +128,6 @@ defineExpose({
 })
 </script>
 
-<style scoped>
-.q-table-scrollbar {
-  overflow-x: auto;
-  overflow-y: hidden;
-  height: 16px;
-}
-
-.q-table-scrollbar-inner {
-  height: 1px;
-  /* necessary to make scrollbar visible */
-}
-</style>
 
 <style lang="scss">
 .sticky-first-column-table {
@@ -166,72 +155,6 @@ defineExpose({
     position: sticky;
     right: 0;
     z-index: 1;
-  }
-}
-
-.q-table__bottom {
-  border: none !important;
-}
-
-.q-table {
-
-  th {
-    border: none;
-    background-color: $primary !important;
-    color: $secondary !important;
-    font-size: 1 !important;
-  }
-
-  th:first-child {
-    border-top-left-radius: 16px !important;
-    border-bottom-left-radius: 16px !important;
-  }
-
-  th:last-child {
-    border-top-right-radius: 16px !important;
-    border-bottom-right-radius: 16px !important;
-  }
-
-  tbody {
-
-    tr {
-      td {
-        background-color: transparent !important;
-        padding: 0 !important;
-        border: none !important;
-
-        &::before {
-          background-color: transparent !important;
-        }
-
-        &>div {
-          margin-top: 16px;
-          height: 80px;
-          text-align: center;
-          width: 100% !important;
-          background-color: white !important;
-          color: $primary !important;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          gap: 8px;
-        }
-      }
-
-      td:first-child {
-        &>div {
-          border-top-left-radius: 16px !important;
-          border-bottom-left-radius: 16px !important;
-        }
-      }
-
-      td:last-child {
-        &>div {
-          border-top-right-radius: 16px !important;
-          border-bottom-right-radius: 16px !important;
-        }
-      }
-    }
   }
 }
 </style>

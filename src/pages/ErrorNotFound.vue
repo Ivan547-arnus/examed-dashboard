@@ -1,24 +1,23 @@
 <template>
-  <div class="fullscreen bg-accent text-primary text-center q-pa-md flex flex-center">
+  <div class="fullscreen bg-grey-4 text-primary text-center q-pa-md flex flex-center">
     <div>
       <div>
-        <q-img no-spinner src="~assets/logo.webp" fit="contain" class="border-md-radius" style="width: 60px;"></q-img>
+        <q-img no-spinner src="~assets/logo.png" fit="contain" class="border-xs-radius" style="width: 320px;"></q-img>
       </div>
       <div class="text-h2">
         404
       </div>
 
-      <div class="text-h6">
+      <div class="text-h6 q-mb-md">
         Oops. No hay nada aquí...
       </div>
 
       <q-btn
+        v-bind="$theme.btn"
         color="primary"
-        text-color="accent"
-        push
+        text-color="white"
         to="/"
         label="Volver al inicio"
-        no-caps
       />
     </div>
   </div>

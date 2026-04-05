@@ -4,31 +4,27 @@ const theme = {
   btnIcon: {
     class: "border-md-radius",
     round: true,
-    push: true,
     noCaps: true,
   },
   btn: {
     class: "border-md-radius",
-    push: true,
     noCaps: true,
   },
   avatar: {
-    class: "border-md-radius",
     size: "40px",
   },
   menu: {
     class: "border-md-radius",
-    offset: [0, 12],
-    transitionShow: "flip-right",
-    transitionHide: "flip-left",
+    offset: [0, 0],
   },
   input: {
-    class: "text-primary",
-    inputClass: "text-primary",
-    standout: "bg-grey-3 text-primary",
+    outlined: true,
+    color: "primary",
+    bgColor: "grey-3",
+    class: "text-dark border-md-radius",
   },
   card: {
-    class: "border-md-radius no-shadow",
+    class: "border-md-radius",
   },
 };
 
@@ -42,11 +38,32 @@ const filters = {
   date(value: string) {
     if (!value) return "";
     return date.formatDate(new Date(value), "DD/MM/YYYY");
-  }
+  },
+  currency(value: number | string | null | undefined) {
+    if (!value) return "";
+    return new Intl.NumberFormat("es-MX", {
+      style: "currency",
+      currency: "MXN",
+    }).format(Number(value));
+  },
 };
+
+const utils = {
+  downloadBlob: (data: Blob, name = "file", ext = "pdf") => {
+    const link = document.createElement("a");
+    link.href = window.URL.createObjectURL(data);
+    link.download = `${name}.${ext}`;
+
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  },
+};
+
 export default defineBoot(({ app }) => {
   app.config.globalProperties.$filters = filters;
   app.config.globalProperties.$theme = theme;
+  app.config.globalProperties.$utils = utils;
 });
 
-export { theme, filters };
+export { theme, filters, utils };

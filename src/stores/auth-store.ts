@@ -9,7 +9,7 @@ export const useAuth = defineStore("auth", {
     user: new User
   }),
   actions: {
-    async login(email: string, password: string) {
+    async login(login: string, password: string) {
       try {
         const {
           data :{
@@ -18,7 +18,7 @@ export const useAuth = defineStore("auth", {
             data,
             token
           }
-        } = await make<IUser>('auth/login', 'POST', { email, password });
+        } = await make<IUser>('auth/login', 'POST', { login, password });
         if (!error) {
           this.user = new User(data);
           this.setToken(token as string);
@@ -46,14 +46,14 @@ export const useAuth = defineStore("auth", {
         const {
           data: {
             error,
-            data
+            user: data
           }
-        } = await make<IUser>('auth/validate-token', 'GET', {
+        } = await make('auth/validate', 'POST', {
           token
         });
 
         if (!error) {
-          this.user = new User(data);
+          this.user = new User(data as IUser);
         } else {
           this.user = new User();
           this.setToken();

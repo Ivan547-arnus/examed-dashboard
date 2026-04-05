@@ -18,15 +18,17 @@ export const question = (
                 title,
                 message,
                 type: 'info',
-                icon: 'bi-question-circle',
+                icon: 'sym_o_help',
                 ok: {
                     ...theme.btn,
                     label: 'Aceptar',
-                    color: 'primary',
+                    color: 'positive',
                 },
                 cancel: {
                     ...theme.btn,
+                    outline: true,
                     label: 'Cancelar',
+                    color: 'negative',
                 },
                 ...config,
             },
@@ -52,18 +54,17 @@ export const questionWithAnswer = (
                 title,
                 message,
                 type: 'info',
-                icon: 'o_flag',
+                icon: 'sym_o_info',
                 ok: {
                     ...theme.btn,
                     label: 'Aceptar',
-                    color: 'primary',
-                    class: 'full-width rounded-button',
+                    color: 'positive',
                 },
                 cancel: {
                     ...theme.btn,
+                    outline: true,
                     label: 'Cancelar',
-                    color: 'primary',
-                    class: 'col rounded-button',
+                    color: 'negative',
                 },
                 ...config,
             },
@@ -85,9 +86,9 @@ export const alert = (
 ): Promise<boolean> => {
     return new Promise((resolve) => {
         const iconOpts = {
-            'positive': 'bi-check-circle',
-            'negative': 'bi-exclamation-circle',
-            'info': 'bi-info-circle',
+            'positive': 'sym_o_check_circle',
+            'negative': 'sym_o_error',
+            'info': 'sym_o_info',
         }
 
         Dialog.create({
@@ -100,7 +101,6 @@ export const alert = (
                     ...theme.btn,
                     label: 'Aceptar',
                     color: config?.type || 'primary',
-                    class: 'full-width rounded-button',
                 },
                 cancel: false,
                 ...config,

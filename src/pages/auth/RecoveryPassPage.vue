@@ -10,7 +10,7 @@
           <div>
             <q-btn v-bind="$theme.btn" type="submit" text-color="secondary" color="primary" class="full-width"
               label="Recuperar Contraseña" />
-            <q-btn v-bind="$theme.btn" to="/auth" icon="bi-arrow-left" flat color="primary" class="full-width q-mt-md"
+            <q-btn v-bind="$theme.btn" to="/auth" icon="sym_o_arrow_left" flat color="primary" class="full-width q-mt-md"
               label="Volver a Iniciar Sesión" />
           </div>
         </q-form>

@@ -1,34 +1,3 @@
-@font-face {
-  font-family: comfortaa-bold;
-  src: url("./fonts/comfortaa/Comfortaa-Bold.ttf");
-}
-
-.comfortaa-bold {
-  font-family: comfortaa-bold;
-}
-
-@font-face {
-  font-family: be-vietnam-pro-bold;
-  src: url("./fonts/be-vietnam-pro/BeVietnamPro-Bold.ttf");
-}
-
-.be-vietnam-pro-bold {
-  font-family: be-vietnam-pro-bold;
-}
-
-@font-face {
-  font-family: be-vietnam-pro-thin;
-  src: url("./fonts/be-vietnam-pro/BeVietnamPro-Thin.ttf");
-}
-
-@font-face {
-  font-family: be-vietnam-pro-regular;
-  src: url("./fonts/be-vietnam-pro/BeVietnamPro-Regular.ttf");
-}
-
-body {
-  font-family: be-vietnam-pro-regular;
-}
 
 .q-field--with-bottom {
   padding-bottom: 0;
@@ -42,16 +11,17 @@ body {
   padding: 4px 8px;
 }
 
-.be-vietnam-pro-thin {
-  font-family: be-vietnam-pro-thin;
+
+.border-xs-radius {
+  border-radius: 4px;
 }
 
-.button {
-  font-family: be-vietnam-pro-bold;
+.border-sm-radius {
+  border-radius: 8px;
 }
 
 .border-md-radius {
-  border-radius: 12px;
+  border-radius: 12px !important;
 }
 
 .border-lg-radius {
@@ -62,62 +32,50 @@ body {
   border-radius: 30px;
 }
 
-.text-title {
-  font-family: comfortaa-bold;
-}
-
 .text-h1 {
   font-size: 40px;
-  font-family: comfortaa-bold;
   font-weight: bold;
+  line-height: 2em;
 }
 
 .text-h2 {
   font-size: 32px;
-  font-family: comfortaa-bold;
   font-weight: bold;
+  
+  line-height: 1.8em;
 }
 
 .text-h3 {
   font-size: 24px;
-  font-family: comfortaa-bold;
   font-weight: bold;
+  line-height: 1.6em;
 }
 
 .text-h4 {
   font-size: 20px;
-  font-family: comfortaa-bold;
   font-weight: bold;
+  line-height: 1.4em;
 }
 
 .text-h5 {
   font-size: 16px;
-  font-family: be-vietnam-pro-bold;
   font-weight: bold;
+  line-height: 1.2em;
 }
 
 .text-h6 {
   font-size: 14px;
-  font-family: be-vietnam-pro-bold;
   font-weight: bold;
+  line-height: 1em;
 }
 
 
 .text-normal {
-  font-family: be-vietnam-pro-regular;
   font-size: 14px;
 }
 
 .q-field__control {
   border-radius: 12px !important;
-}
-
-.q-field__label {
-  font-family: be-vietnam-pro-bold !important;
-}
-
-.q-field__native {
-  font-family: be-vietnam-pro-regular !important;
 }
 
 // No se por que standout se pone negro, pero con esto se arreglo
@@ -127,4 +85,9 @@ body {
 
 .q-field--standout.q-field--highlighted .q-field__native, .q-field--standout.q-field--highlighted .q-field__prefix, .q-field--standout.q-field--highlighted .q-field__suffix, .q-field--standout.q-field--highlighted .q-field__prepend, .q-field--standout.q-field--highlighted .q-field__append, .q-field--standout.q-field--highlighted .q-field__input {
     color: $primary !important;
+}
+
+
+.q-btn {
+  font-size: 1.15em;
 }

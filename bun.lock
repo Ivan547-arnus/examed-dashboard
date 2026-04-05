@@ -3,7 +3,7 @@
   "configVersion": 1,
   "workspaces": {
     "": {
-      "name": "kaptari-dashboard",
+      "name": "examed-dashboard",
       "dependencies": {
         "@quasar/extras": "^1.16.4",
         "axios": "^1.2.1",

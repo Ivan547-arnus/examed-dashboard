@@ -36,6 +36,7 @@ export default defineConfig((/* ctx */) => {
 
       'roboto-font', // optional, you are not bound to it
       'material-icons', // optional, you are not bound to it
+      'material-symbols-outlined',
       'bootstrap-icons'
     ],
 
@@ -52,14 +53,13 @@ export default defineConfig((/* ctx */) => {
         // extendTsConfig (tsConfig) {}
       },
 
-      vueRouterMode: 'history', // available values: 'hash', 'history'
+      vueRouterMode: 'hash', // available values: 'hash', 'history'
       // vueRouterBase,
       // vueDevtools,
       // vueOptionsAPI: false,
 
       // rebuildCache: true, // rebuilds Vite/linter/etc cache on startup
 
-      // publicPath: '/kaptari/dashboard/',
       // analyze: true,
       // env: {},
       env: configDotenv()?.parsed ?? {},
@@ -104,7 +104,7 @@ export default defineConfig((/* ctx */) => {
       // directives: [],
 
       // Quasar plugins
-      plugins: ['Meta', 'LoadingBar', 'Dialog', 'LocalStorage', 'Notify']
+      plugins: ['Meta', 'LoadingBar', 'Dialog', 'LocalStorage', 'Notify', 'Loading']
     },
 
     // animations: 'all', // --- includes all animations
@@ -202,7 +202,7 @@ export default defineConfig((/* ctx */) => {
       builder: {
         // https://www.electron.build/configuration/configuration
 
-        appId: 'kaptari-dashboard'
+        appId: 'examed-dashboard'
       }
     },
 

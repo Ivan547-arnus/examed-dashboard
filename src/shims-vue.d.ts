@@ -1,6 +1,6 @@
 import type { Router } from "vue-router";
 import type { IRules } from "./types/IRules";
-
+import type { QBtnProps } from "quasar";
 declare module "@vue/runtime-core" {
   interface ComponentCustomProperties {
     $filters: {
@@ -9,8 +9,8 @@ declare module "@vue/runtime-core" {
       dateTime: (date: string) => string;
     },
     $theme: {
-      btnIcon: Record<string, unknown>;
-      btn: Record<string, unknown>;
+      btnIcon: QBtnProps;
+      btn: QBtnProps;
       avatar: Record<string, unknown>;
       menu: Record<string, unknown>;
       input: Record<string, unknown>;
