@@ -4,6 +4,9 @@
       <div class="login-panel__brand">
 
         <div class="login-panel__copy">
+          <div class="login-panel__logo">
+            <q-img no-spinner src="~assets/logo.png" fit="contain" class="full-width"></q-img>
+          </div>
           <p class="login-panel__eyebrow">Panel administrativo</p>
           <h1 class="text-h2 q-ma-none">Bienvenido</h1>
           <p class="text-normal q-mb-none">
@@ -23,7 +26,7 @@
         <div class="login-panel__form">
           <div class="login-panel__form-copy">
             <p class="login-panel__eyebrow text-dark">Iniciar sesion</p>
-            <h2 class="text-h3 q-mt-sm q-mb-sm text-dark">Accede a tu cuenta</h2>
+            <h2 class="text-h3 q-my-none text-dark">Accede a tu cuenta</h2>
             <p class="text-normal text-grey-7 q-mb-xl">
               Usa tu correo y contraseña registrados para entrar a la plataforma.
             </p>
@@ -169,9 +172,13 @@ async function handleLogin() {
 }
 
 .login-panel__logo {
-  width: 190px;
+  width: 100px;
   max-width: 100%;
-  height: 56px;
+  height: auto;
+  background-color: $grey-3;
+  border-radius: 12px;
+  padding: 12px;
+  margin-bottom: 12px;
 }
 
 .login-panel__copy,
@@ -225,6 +232,17 @@ async function handleLogin() {
     display: none;
   }
 
+  .login-panel__brand {
+    .login-panel__copy {
+      width: 100%;
+      max-width: unset;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+    }
+  }
+
   .login-panel__brand,
   .login-panel__form-wrap {
     padding: 32px 24px;
@@ -237,7 +255,19 @@ async function handleLogin() {
   }
 
   .login-panel {
-    border-radius: 8px;
+    border-radius: 12px;
+  }
+
+
+  .login-panel__brand {
+    .login-panel__copy {
+      width: 100%;
+      max-width: unset;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+    }
   }
 
   .login-panel__brand,

@@ -37,7 +37,7 @@
       </q-toolbar>
     </q-header>
 
-    <q-drawer show-if-above v-model="menuDrawer"  class="bg-dark" side="left" :width="280">
+    <q-drawer show-if-above v-model="menuDrawer"  class="bg-dark" side="left" :width="320">
       <div class="menu-container">
         <div class="menu-icon">
           <q-img no-spinner src="~assets/logo-horizontal.png" fit="contain" class="full-width" style="max-height: 120px;"></q-img>
