@@ -10,14 +10,8 @@
             </template>
           </q-input>
           <div>
-            <q-btn
-              v-bind="$theme.btn"
-              icon="sym_o_add"
-              color="grey-3"
-              label="Nuevo verificador"
-              text-color="primary"
-              @click="verifierFormRef?.open()"
-            ></q-btn>
+            <q-btn v-bind="$theme.btn" icon="sym_o_add" color="grey-3" label="Nuevo verificador" text-color="primary"
+              @click="verifierFormRef?.open()"></q-btn>
           </div>
         </div>
       </q-card-section>
@@ -34,6 +28,17 @@
             <q-btn outline v-bind="$theme.btn" @click="verifierFormRef?.open()" icon="sym_o_add" color="primary"
               label="Nuevo verificador"></q-btn>
           </div>
+        </template>
+
+        <template #body-cell-cal_termometro="props">
+          <q-td key="cal_termometro" :props="props">
+            <q-chip v-bind="formatRemainingDays(props.row.material?.latest_calibration_termometer?.remaining_days)" />
+          </q-td>
+        </template>
+        <template #body-cell-cal_medida_vol="props">
+          <q-td key="cal_medida_vol" :props="props">
+            <q-chip v-bind="formatRemainingDays(props.row.material?.latest_calibration_measure?.remaining_days)" />
+          </q-td>
         </template>
         <template #body-cell-actions="props">
           <q-td key="actions" :props="props">
@@ -96,7 +101,7 @@ const columns = [
   },
   {
     name: 'second_lastname',
-    field: (row:IUser) => row.second_lastname ?? '-',
+    field: (row: IUser) => row.second_lastname ?? '-',
     label: 'Segundo apellido',
     align: 'left',
     searchable: true,
@@ -121,8 +126,24 @@ const columns = [
   },
   {
     name: 'phone',
-    field: (row:IUser) => row.phone ?? '-',
+    field: (row: IUser) => row.phone ?? '-',
     label: 'Teléfono',
+    align: 'left',
+    color: 'primary',
+    sortable: false
+  },
+  {
+    name: 'cal_medida_vol',
+    field: 'cal_medida_vol',
+    label: 'Cal. Medida vol.',
+    align: 'left',
+    color: 'primary',
+    sortable: false
+  },
+  {
+    name: 'cal_termometro',
+    field: 'cal_termometro',
+    label: 'Cal. Termometro',
     align: 'left',
     color: 'primary',
     sortable: false
@@ -135,7 +156,46 @@ const columns = [
     sortable: false
   }
 ];
-function onSaved(data:IUser) {
+
+function formatRemainingDays(remainingDays: number | null) {
+  if(!remainingDays) {
+    return {
+      color: 'grey-6',
+      textColor: 'white',
+      dense: true,
+      label: 'Sin calibraciones'
+    }
+  }
+
+  if (remainingDays < 30) {
+    return {
+      color: 'negative',
+      textColor: 'white',
+      dense: true,
+      label: remainingDays < 0 ? `Vencio hace ${Math.abs(remainingDays)} dias` : `Vence en ${Math.abs(remainingDays)} dias`
+    }
+  }
+
+  if (remainingDays < 90) {
+    return {
+      remainingDays,
+      color: 'warning',
+      textColor: 'white',
+      dense: true,
+      label: `Vence en ${Math.abs(remainingDays)} dias`
+    }
+  }
+
+  return {
+    remainingDays,
+    color: 'positive',
+    textColor: 'white',
+    dense: true,
+    label: `Vence en ${Math.abs(remainingDays)} dias`
+  }
+}
+
+function onSaved(data: IUser) {
   void router.push('/verificadores/editar/' + data.id);
 }
 

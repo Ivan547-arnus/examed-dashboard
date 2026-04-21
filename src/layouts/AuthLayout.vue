@@ -19,7 +19,7 @@ import { useMeta } from 'quasar';
 import { computed } from 'vue';
 import { useRouter } from 'vue-router';
 const router = useRouter()
-const title = computed(() => 'Example | Dashboard | ' + (router.currentRoute.value.meta.title as string))
+const title = computed(() => 'Examed | Dashboard | ' + (router.currentRoute.value.meta.title as string))
 useMeta(() => ({
   title: title.value,
 }))

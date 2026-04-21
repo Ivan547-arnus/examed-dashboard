@@ -12,8 +12,9 @@
           :label="`Registros por pagina: ${pagination.rowsPerPage}`" icon-right="bi-arrow-down-short">
           <q-menu v-bind="$theme.menu" anchor="bottom right" self="top right">
             <q-list>
-              <q-item v-for="item in [5, 7, 10, 25, 50, 100]" clickable v-close-popup @click="() =>  { pagination.rowsPerPage = item; handleRequest(); }"
-                :key="item" class="be-vietnam-pro-bold">
+              <q-item v-for="item in [5, 7, 10, 25, 50, 100]" clickable v-close-popup
+                @click="() => { pagination.rowsPerPage = item; handleRequest(); }" :key="item"
+                class="be-vietnam-pro-bold">
                 <q-item-section>{{ item }}</q-item-section>
               </q-item>
             </q-list>
@@ -63,15 +64,12 @@ const pagination = defineModel<{ page: number; rowsPerPage: number; sortBy: null
     rowsNumber: 0
   }
 });
+
 const searchFields = computed(() => {
   return props.columns?.filter((column) => column.searchable === true).map((column) => column.name)
 });
-const range = computed(() => ({
-  min: pagination.value.page == 1 ? 1 : Math.max((Math.ceil(pagination.value.rowsNumber / pagination.value.rowsPerPage)) - 5, 1),
-  max: Math.ceil(pagination.value.rowsNumber / pagination.value.rowsPerPage)
-}))
 
-
+const range = ref({ min: 1, max: 1 });
 
 async function handleTableRequest(val: { pagination: { page: number; rowsPerPage: number; sortBy: string; descending: boolean } }) {
   pagination.value.sortBy = val.pagination.sortBy;
@@ -114,11 +112,13 @@ async function handleRequest() {
     loading.value = false
     rows.value = []
     pagination.value.rowsNumber = 0
+  } finally {
+    range.value.min = pagination.value.page == 1 ? 1 : Math.max((Math.ceil(pagination.value.rowsNumber / pagination.value.rowsPerPage)) - 5, 1)
+    range.value.max = Math.ceil(pagination.value.rowsNumber / pagination.value.rowsPerPage)
   }
 }
 
 watch(() => search.value, debounce(handleRequest, 500))
-
 onMounted(async () => {
   await handleRequest()
 })
