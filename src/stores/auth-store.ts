@@ -6,7 +6,12 @@ import { type IUser, User } from "src/types/IUser";
 export const useAuth = defineStore("auth", {
   state: () => ({
     token: null as string | null,
-    user: new User
+    user: new User,
+    menu: [] as Array<{
+      icon: string,
+      title: string,
+      to: string
+    }>
   }),
   actions: {
     async login(login: string, password: string) {
@@ -46,7 +51,8 @@ export const useAuth = defineStore("auth", {
         const {
           data: {
             error,
-            user: data
+            user: data,
+            menu
           }
         } = await make('auth/validate', 'POST', {
           token
@@ -54,8 +60,10 @@ export const useAuth = defineStore("auth", {
 
         if (!error) {
           this.user = new User(data as IUser);
+          this.menu = menu as [];
         } else {
           this.user = new User();
+          this.menu = [];
           this.setToken();
         }
 
@@ -65,6 +73,7 @@ export const useAuth = defineStore("auth", {
         }
       } catch {
         this.user = new User();
+        this.menu = [];
         this.setToken();
         return {
           error: true,

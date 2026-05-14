@@ -44,7 +44,7 @@
         </div>
         <q-scroll-area>
           <q-list class="q-pa-md">
-            <essential-link v-for="item in menu" :key="item.title" v-bind="item" />
+            <essential-link v-for="item in auth.menu" :key="item.title" v-bind="item" />
           </q-list>
         </q-scroll-area>
         <div class="q-pa-md menu-footer">
@@ -75,23 +75,7 @@ useMeta(() => ({
 }))
 const auth = useAuth()
 const menuDrawer = ref(false)
-const menu = [
-  {
-    title: 'Inicio',
-    icon: 'sym_o_home',
-    to: '/'
-  },
-  {
-    title: 'Administradores',
-    icon: 'sym_o_people',
-    to: '/administradores'
-  },
-  {
-    title: 'Verificadores',
-    icon: 'sym_o_engineering',
-    to: '/verificadores'
-  }
-]
+
 
 async function handleLogout() {
   const answer = await question('Sesión', '<span class="text-bold">¿Desea cerrar sesión?</span>', { type: 'negative', ok: { ...theme.btn, label: 'Cerrar sesión', color: 'negative' } });
