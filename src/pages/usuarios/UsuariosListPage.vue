@@ -1,9 +1,9 @@
 <template>
-  <q-page padding>
-    <q-card v-bind="$theme.card" class="bg-primary">
-      <q-card-section>
-        <div class="row q-col-gutter-md justify-end">
-          <q-input class="col-12 col-sm-3" v-bind="$theme.input" v-model="search" label="Buscar..." dense clearable
+  <q-page padding class="extended">
+    <q-card v-bind="$theme.card" class="bg-transparent no-shadow">
+      <q-card-section class="q-px-none">
+        <div class="row justify-between">
+          <q-input class="col-12 col-sm-5" v-bind="$theme.input" v-model="search" label="Buscar..." dense clearable
             clear-icon="sym_o_close">
             <template #append>
               <q-icon name="sym_o_search"></q-icon>
@@ -11,20 +11,19 @@
           </q-input>
           <div>
             <q-btn v-bind="$theme.btn" class="col-12 col-sm-4" to="/administradores/nuevo" icon="sym_o_add"
-              color="grey-3" label="Nuevo administrador" text-color="primary"></q-btn>
+              color="dark" label="Nuevo administrador" text-color="secondary"></q-btn>
           </div>
         </div>
       </q-card-section>
     </q-card>
-    <q-card v-bind="$theme.card" class="full-width q-mt-md">
+    <q-card v-bind="$theme.card" class="full-width">
       <q-table-component ref="table" :loading="loading" url="/admin/users" :search="search" class="border-xs-radius"
-        table-header-class="text-h6 bg-grey-3 text-dark" :columns="columns">
+        table-header-class="text-h6 bg-primary text-secondary" :columns="columns">
         <template #no-data>
           <div class="no-items text-primary" v-if="!loading">
-            <q-avatar v-bind="$theme.avatar" color="primary" size="78px">
-              <q-icon name="sym_o_info" color="white" size="1.75em"></q-icon>
+            <q-avatar v-bind="$theme.avatar" color="grey-3" size="78px">
+              <q-icon name="sym_o_info" color="primary" size="1.25em"></q-icon>
             </q-avatar>
-
             <span class="text-h6">{{ search?.length ? `Oops, aun no existen administradores para "${search}"` : 'Oops, aun no existen administradores' }}</span>
             <q-btn outline v-bind="$theme.btn" to="/administradores/nuevo" icon="sym_o_add" color="primary"
               label="Nuevo administrador"></q-btn>

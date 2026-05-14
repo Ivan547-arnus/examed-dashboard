@@ -71,10 +71,30 @@ const routes: RouteRecordRaw[] = [
         name: "Información del Verificador",
         meta: {
           title: "Información del Verificador",
-          subtitle: "Visualiza, edita y configura la información del verificador",
+          subtitle: "Actualice la información personal del verificador",
           auth: true,
         },
         component: () => import("pages/verificadores/VerificadorFormPage.vue"),
+      },
+      {
+        path: "asignacion-folios/:id",
+        name: "Asignación de folios",
+        meta: {
+          title: "Configuración del equipo de trabajo",
+          subtitle: "Asignanación y configuración del equipo de trabajo",
+          auth: true,
+        },
+        component: () => import("pages/verificadores/VerificadorFoliosPage.vue"),
+      },
+      {
+        path: "configuracion-equipo/:id",
+        name: "Configuración del equipo de trabajo",
+        meta: {
+          title: "Configuración del equipo de trabajo",
+          subtitle: "Asignanación y configuración del equipo de trabajo",
+          auth: true,
+        },
+        component: () => import("pages/verificadores/VerificadorEquipoPage.vue"),
       }
     ]
   },

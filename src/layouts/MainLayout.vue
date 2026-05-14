@@ -1,6 +1,6 @@
 <template>
-  <q-layout view="lHh LpR lFf" class="grey-3">
-    <q-header class="bg-grey-3" height-hint="98" bordered>
+  <q-layout view="lHh LpR lFf" class="bg-grey-1">
+    <q-header class="bg-secondary" height-hint="98" bordered>
       <q-toolbar style="height: 60px;">
         <q-btn v-bind="$theme.btnIcon" flat color="dark" @click="menuDrawer = !menuDrawer">
           <q-icon name="sym_o_menu"></q-icon>
@@ -12,7 +12,7 @@
         <q-space></q-space>
         <q-btn padding="xs sm" v-bind="$theme.btn" no-caps flat color="white">
           <q-avatar v-bind="$theme.avatar" size="40px" color="dark" class="q-mr-sm" round>
-            <q-icon name="sym_o_person" color="white" size="1.2em"></q-icon>
+            <q-icon name="sym_o_person" color="secondary" size="1.2em"></q-icon>
           </q-avatar>
           <q-item class="text-dark">
             <q-item-section class="q-mr-sm">
@@ -37,10 +37,10 @@
       </q-toolbar>
     </q-header>
 
-    <q-drawer show-if-above v-model="menuDrawer"  class="bg-dark" side="left" :width="320">
+    <q-drawer show-if-above v-model="menuDrawer"  class="bg-dark" side="left" :width="280">
       <div class="menu-container">
         <div class="menu-icon">
-          <q-img no-spinner src="~assets/logo-horizontal.png" fit="contain" class="full-width" style="max-height: 120px;"></q-img>
+          <q-img no-spinner src="~assets/logo-horizontal.png" ratio="1 / 1" fit="contain" class="full-width" style="max-height: 120px;"></q-img>
         </div>
         <q-scroll-area>
           <q-list class="q-pa-md">
@@ -53,7 +53,7 @@
       </div>
     </q-drawer>
 
-    <q-page-container class="border-xs-radius" style="max-width: 1440px; margin: auto">
+    <q-page-container class="border-xs-radius bg-grey-1">
       <router-view />
     </q-page-container>
   </q-layout>
@@ -104,13 +104,12 @@ async function handleLogout() {
 
 <style scoped lang="scss">
 .menu-icon {
-  display: flex;
-  justify-content: space-between;
-  align-items: start;
+  display: grid;
+  grid-template-columns: 1fr;
   width: 100%;
   background-color: $dark;
   padding: 12px;
-  height: 60px;
+  height: 80px;
   .q-img {
     height: 100%;
     border-radius: 12px;
@@ -122,7 +121,21 @@ async function handleLogout() {
   display: grid;
   grid-template-rows: auto 1fr auto;
   height: 100%;
-  gap: 24px;
+  padding-top: 24px;
 }
+</style>
 
+<style lang="scss">
+.q-page.extended::before {
+  position: absolute;
+  top: 0;
+  content: '';
+  background-color: $secondary !important;
+  height: 160px !important;
+  width: 100%;
+  left: 0;
+  padding: inherit;
+  border-bottom-left-radius: 12px;
+  border-bottom-right-radius: 12px;
+}
 </style>

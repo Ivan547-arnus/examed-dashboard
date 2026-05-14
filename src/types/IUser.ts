@@ -3,6 +3,7 @@ export interface IUser {
   name: string;
   lastname: string;
   second_lastname: string;
+  fullname: string;
   email: string;
   phone?: string;
   username: string;
@@ -15,6 +16,7 @@ export class User implements IUser {
   name: string = '';
   lastname: string = '';
   second_lastname: string = '';
+  fullname: string = '';
   email: string = '';
   phone: string = '';
   username: string = '';

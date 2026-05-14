@@ -1,6 +1,6 @@
 <template>
   <!-- @vue-ignore -->
-  <q-table ref="table" v-bind="$props" :rows="rows" :loading="loading" v-model:pagination="pagination"
+  <q-table ref="table" v-bind="$props" v-touch-pan.prevent.mouse="handlePan" :rows="rows" :loading="loading" v-model:pagination="pagination"
     @request="handleTableRequest">
     <!-- @vue-skip -->
     <template v-for="(_, slot) of $slots" v-slot:[slot]="scope">
@@ -8,7 +8,7 @@
     </template>
     <template #bottom>
       <div class="full-width flex justify-end q-gutter-sm q-my-sm">
-        <q-btn v-bind="$theme.btn" color="primary" text-color="white"
+        <q-btn v-bind="$theme.btn" color="dark" text-color="secondary"
           :label="`Registros por pagina: ${pagination.rowsPerPage}`" icon-right="bi-arrow-down-short">
           <q-menu v-bind="$theme.menu" anchor="bottom right" self="top right">
             <q-list>
@@ -20,13 +20,13 @@
             </q-list>
           </q-menu>
         </q-btn>
-        <q-btn v-bind="$theme.btnIcon" :disabled="pagination.page == 1" dense color="primary" text-color="white"
+        <q-btn v-bind="$theme.btnIcon" :disabled="pagination.page == 1" dense color="dark" text-color="secondary"
           icon="sym_o_arrow_left" @click="() => { pagination.page--; handleRequest(); }"></q-btn>
-        <q-pagination rounded size="16px" v-model="pagination.page" @update:model-value="handleRequest" color="primary"
-          active-color="primary" active-text-color="white" text-color="primary" :min="range.min" :max="range.max" />
-        <q-btn v-bind="$theme.btnIcon" :disabled="pagination.page == range.max" dense color="primary" text-color="white"
+        <q-pagination rounded size="16px" v-model="pagination.page" @update:model-value="handleRequest" color="dark"
+          active-color="dark" active-text-color="secondary" text-color="dark" :min="range.min" :max="range.max" />
+        <q-btn v-bind="$theme.btnIcon" :disabled="pagination.page == range.max" dense color="dark" text-color="secondary"
           icon="sym_o_arrow_right" @click="() => { pagination.page++; handleRequest(); }"></q-btn>
-        <q-btn v-bind="$theme.btnIcon" @click="handleRequest" dense text-color="white" color="primary"
+        <q-btn v-bind="$theme.btnIcon" @click="handleRequest" dense text-color="secondary" color="dark"
           icon="sym_o_refresh">
         </q-btn>
       </div>
@@ -49,7 +49,7 @@ interface Props extends Omit<QTableProps, 'rows'> {
 <script lang="ts" setup>
 import { debounce, type QTableProps, type QTableSlots } from 'quasar';
 import { make } from 'src/boot/axios';
-import { computed, nextTick, onMounted, ref, watch } from 'vue';
+import { computed, nextTick, onMounted, ref, type VNodeRef, watch } from 'vue';
 const props = withDefaults(defineProps<Props>(), {});
 const search = defineModel<string>('search');
 const loading = defineModel<boolean>('loading');
@@ -65,6 +65,8 @@ const pagination = defineModel<{ page: number; rowsPerPage: number; sortBy: null
   }
 });
 
+const table = ref<null | VNodeRef>(null);
+
 const searchFields = computed(() => {
   return props.columns?.filter((column) => column.searchable === true).map((column) => column.name)
 });
@@ -79,6 +81,18 @@ async function handleTableRequest(val: { pagination: { page: number; rowsPerPage
   await nextTick()
   void handleRequest();
 }
+
+
+function handlePan(event: { duration: number; delta: { x: number; y: number } }) {
+    const { duration } = event;
+    if (duration < 200) return;
+    const tableBody = table.value?.$el.querySelector('.q-table__middle.scroll');
+
+    if (tableBody) {
+        tableBody.scrollTop -= event.delta.y
+        tableBody.scrollLeft -= event.delta.x
+    }
+};
 
 async function handleRequest() {
   if (!props.url) return

@@ -4,16 +4,16 @@
       <div class="col-12 flex justify-between">
         <q-btn v-bind="$theme.btn" color="grey-3" text-color="primary" to="/administradores" icon="sym_o_arrow_back"
           label="Regresar"></q-btn>
-        <q-btn v-bind="$theme.btn" type="submit" form="user-form" icon="sym_o_save" color="primary"
+        <q-btn v-bind="$theme.btn" type="submit" form="user-form" icon="sym_o_save" color="primary" text-color="secondary"
           label="Guardar"></q-btn>
       </div>
       <div class="col-12">
         <q-form class="row q-col-gutter-md" id="user-form" @submit.prevent="onSubmit">
           <div class="col-12">
             <q-card v-bind="$theme.card">
-              <q-item class="bg-grey-3">
+              <q-item class="bg-primary text-secondary">
                 <q-item-section>
-                  <q-item-label class="text-h4 text-primary">
+                  <q-item-label class="text-h4 text-secondary">
                     Información personal
                   </q-item-label>
                 </q-item-section>

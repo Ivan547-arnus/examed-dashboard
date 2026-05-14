@@ -1,5 +1,4 @@
 import { defineBoot } from "@quasar/app-vite/wrappers";
-import { date } from "quasar";
 import dayjs from "src/plugins/dayjs";
 const theme = {
   btnIcon: {
@@ -20,12 +19,12 @@ const theme = {
   },
   input: {
     outlined: true,
-    color: "primary",
-    bgColor: "grey-3",
+    color: "dark",
+    bgColor: "white",
     class: "text-dark border-md-radius",
   },
   card: {
-    class: "border-md-radius",
+    class: "border-md-radius shadow-1",
   },
 };
 
@@ -34,15 +33,10 @@ const filters = {
     return process.env.API_URL + "/uploads/" + uuid;
   },
   dateTime(value: string) {
-    const currentDate = filters.buildDate(value);
-    if(!currentDate) return "Fecha no disponible"
-    return date.formatDate(currentDate, "DD/MMMM/YYYY HH:mm:ss");
+    return dayjs(value).format("DD/MMMM/YYYY HH:mm:ss");
   },
   date(value: string) {
-    if (!value) return "";
-    const currentDate = filters.buildDate(value);
-    if(!currentDate) return "Fecha no disponible"
-    return date.formatDate(currentDate, "DD/MMMM/YYYY");
+    return dayjs(value).format("DD/MMMM/YYYY");
   },
   currency(value: number | string | null | undefined) {
     if (!value) return "";

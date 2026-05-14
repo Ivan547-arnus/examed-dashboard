@@ -1,7 +1,7 @@
 <template>
   <q-dialog v-model="model">
     <q-card v-bind="$theme.card" class="full-width verificador-dialog">
-      <q-item class="bg-primary text-white">
+      <q-item class="bg-primary text-secondary">
         <q-item-section>
           <q-item-label class="text-h5">Nuevo verificador</q-item-label>
           <q-item-label caption class="text-grey-2">
@@ -59,7 +59,7 @@
         <q-separator></q-separator>
         <q-card-actions align="right" class="bg-white q-pa-md">
           <q-btn v-bind="$theme.btn" color="grey-3" text-color="primary" label="Cancelar" v-close-popup></q-btn>
-          <q-btn v-bind="$theme.btn" type="submit" form="verificador-form" color="primary" icon="sym_o_save"
+          <q-btn v-bind="$theme.btn" type="submit" form="verificador-form" text-color="secondary" color="primary" icon="sym_o_save"
             :loading="saving" label="Guardar"></q-btn>
         </q-card-actions>
       </q-card>

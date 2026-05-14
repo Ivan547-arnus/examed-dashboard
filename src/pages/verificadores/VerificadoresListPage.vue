@@ -1,28 +1,28 @@
 <template>
-  <q-page padding>
-    <q-card v-bind="$theme.card" class="bg-primary">
-      <q-card-section>
-        <div class="row q-col-gutter-md justify-end">
-          <q-input class="col-12 col-sm-3" v-bind="$theme.input" v-model="search" label="Buscar..." dense clearable
+  <q-page padding class="extended">
+    <q-card v-bind="$theme.card" class="bg-transparent no-shadow">
+      <q-card-section class="q-px-none">
+        <div class="row q-col-gutter-md justify-between">
+          <q-input class="col-12 col-sm-5" v-bind="$theme.input" v-model="search" label="Buscar..." dense clearable
             clear-icon="sym_o_close">
             <template #append>
               <q-icon name="sym_o_search"></q-icon>
             </template>
           </q-input>
           <div>
-            <q-btn v-bind="$theme.btn" icon="sym_o_add" color="grey-3" label="Nuevo verificador" text-color="primary"
+            <q-btn v-bind="$theme.btn" icon="sym_o_add" color="dark" label="Nuevo verificador" text-color="secondary"
               @click="verifierFormRef?.open()"></q-btn>
           </div>
         </div>
       </q-card-section>
     </q-card>
-    <q-card v-bind="$theme.card" class="full-width q-mt-md">
+    <q-card v-bind="$theme.card" class="full-width">
       <q-table-component ref="table" url="/verifier/users" :search="search" class="border-xs-radius"
-        table-header-class="text-h6 bg-grey-3 text-dark" :columns="columns">
+        table-header-class="text-h6 bg-primary text-secondary" :columns="columns">
         <template #no-data>
           <div class="no-items text-primary">
-            <q-avatar v-bind="$theme.avatar" color="primary" size="78px">
-              <q-icon name="sym_o_info" color="white" size="1.75em"></q-icon>
+            <q-avatar v-bind="$theme.avatar" color="grey-3" size="78px">
+              <q-icon name="sym_o_info" color="primary" size="1.25em"></q-icon>
             </q-avatar>
             <span class="text-h6">{{ search?.length ? `Oops, aun no existen verificadores para "${search}"` : 'Oops, aun no existen verificadores' }}</span>
             <q-btn outline v-bind="$theme.btn" @click="verifierFormRef?.open()" icon="sym_o_add" color="primary"
@@ -30,14 +30,14 @@
           </div>
         </template>
 
-        <template #body-cell-cal_termometro="props">
+        <template #body-cell-cal_medida_vol="props">
           <q-td key="cal_termometro" :props="props">
-            <q-chip v-bind="formatRemainingDays(props.row.material?.latest_calibration_termometer?.remaining_days)" />
+            <q-chip v-bind="formatRemainingDays(props.row.verifier_data?.medida?.fecha_vencimiento)" />
           </q-td>
         </template>
-        <template #body-cell-cal_medida_vol="props">
+        <template #body-cell-cal_termometro="props">
           <q-td key="cal_medida_vol" :props="props">
-            <q-chip v-bind="formatRemainingDays(props.row.material?.latest_calibration_measure?.remaining_days)" />
+            <q-chip v-bind="formatRemainingDays(props.row.verifier_data?.termometro?.fecha_vencimiento)" />
           </q-td>
         </template>
         <template #body-cell-actions="props">
@@ -47,9 +47,22 @@
                 <q-list separator class="border-xs-radius">
                   <q-item clickable v-ripple class="text-dark" :to="`/verificadores/editar/${props.row.id}`">
                     <q-item-section avatar>
+                      <q-icon name="sym_o_edit_square" color="dark"></q-icon>
+                    </q-item-section>
+                    <q-item-section class="text-no-wrap">Actualizar datos personales</q-item-section>
+                  </q-item>
+                  <q-item clickable v-ripple class="text-dark" :to="`/verificadores/asignacion-folios/${props.row.id}`">
+                    <q-item-section avatar>
+                      <q-icon name="sym_o_license" color="dark"></q-icon>
+                    </q-item-section>
+                    <q-item-section class="text-no-wrap">Asignación de folios</q-item-section>
+                  </q-item>
+                  <q-item clickable v-ripple class="text-dark"
+                    :to="`/verificadores/configuracion-equipo/${props.row.id}`">
+                    <q-item-section avatar>
                       <q-icon name="sym_o_manufacturing" color="dark"></q-icon>
                     </q-item-section>
-                    <q-item-section class="text-no-wrap">Configurar verificador</q-item-section>
+                    <q-item-section class="text-no-wrap">Configuración de equipo</q-item-section>
                   </q-item>
                   <q-item clickable v-ripple class="text-negative" @click="handleDelete(props.row.id)">
                     <q-item-section avatar>
@@ -71,13 +84,12 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import VerificadorFormModal from './VerificadorFormModal.vue';
-import { useRouter } from 'vue-router';
 import type { IUser } from 'src/types/IUser';
 import QTableComponent from 'src/components/QTableComponent.vue';
 import { alert, question } from 'src/config/dialog';
 import { theme } from 'src/boot/helpers';
 import { make } from 'src/boot/axios';
-const router = useRouter();
+import dayjs from 'dayjs';
 const verifierFormRef = ref<null | { open: () => void }>(null);
 const showFormModal = ref(false);
 const search = ref('');
@@ -157,20 +169,23 @@ const columns = [
   }
 ];
 
-function formatRemainingDays(remainingDays: number | null) {
-  if(!remainingDays) {
+function formatRemainingDays(fechaVencimiento: null | string) {
+  if (!fechaVencimiento) {
     return {
-      color: 'grey-6',
-      textColor: 'white',
+      color: 'grey-3',
+      textColor: 'grey-9',
       dense: true,
       label: 'Sin calibraciones'
     }
   }
 
+  const today = dayjs();
+  const remainingDays = dayjs(fechaVencimiento).diff(today, 'days');
+
   if (remainingDays < 30) {
     return {
-      color: 'negative',
-      textColor: 'white',
+      color: 'red-1',
+      textColor: 'red-9',
       dense: true,
       label: remainingDays < 0 ? `Vencio hace ${Math.abs(remainingDays)} dias` : `Vence en ${Math.abs(remainingDays)} dias`
     }
@@ -179,8 +194,8 @@ function formatRemainingDays(remainingDays: number | null) {
   if (remainingDays < 90) {
     return {
       remainingDays,
-      color: 'warning',
-      textColor: 'white',
+      color: 'yellow-1',
+      textColor: 'yellow-9',
       dense: true,
       label: `Vence en ${Math.abs(remainingDays)} dias`
     }
@@ -188,15 +203,15 @@ function formatRemainingDays(remainingDays: number | null) {
 
   return {
     remainingDays,
-    color: 'positive',
-    textColor: 'white',
+    color: 'green-1',
+    textColor: 'green-9',
     dense: true,
     label: `Vence en ${Math.abs(remainingDays)} dias`
   }
 }
 
-function onSaved(data: IUser) {
-  void router.push('/verificadores/editar/' + data.id);
+function onSaved() {
+  table.value?.refresh();
 }
 
 async function handleDelete(id: string) {
