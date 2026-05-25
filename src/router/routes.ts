@@ -99,6 +99,25 @@ const routes: RouteRecordRaw[] = [
     ]
   },
   {
+    path: "/estaciones",
+    meta: {
+      title: "Estaciones",
+      auth: true,
+    },
+    component: () => import("layouts/MainLayout.vue"),
+    children: [
+      {
+        path: "",
+        meta: {
+          title: "Estaciones",
+          subtitle: "Lista de estaciones ExaMed",
+          auth: true,
+        },
+        component: () => import("pages/estaciones/EstacionesListPage.vue"),
+      }
+    ]
+  },
+  {
     path: "/auth",
     meta: {
       title: "Autenticación",

@@ -112,10 +112,6 @@ async function handleRequest() {
     if (!error) {
       rows.value = data.data
       pagination.value.rowsNumber = data.total
-      await nextTick()
-      if (pagination.value.page > range.value.max) {
-        pagination.value.page = range.value.max
-      }
     } else {
       rows.value = []
       pagination.value.rowsNumber = 0
@@ -127,8 +123,9 @@ async function handleRequest() {
     rows.value = []
     pagination.value.rowsNumber = 0
   } finally {
-    range.value.min = pagination.value.page == 1 ? 1 : Math.max((Math.ceil(pagination.value.rowsNumber / pagination.value.rowsPerPage)) - 5, 1)
-    range.value.max = Math.ceil(pagination.value.rowsNumber / pagination.value.rowsPerPage)
+    range.value.min = pagination.value.page == 1 ? 1 : Math.max(pagination.value.page - 2, 1)
+    range.value.max = Math.min(Math.ceil(pagination.value.rowsNumber / pagination.value.rowsPerPage), pagination.value.page + 2)
+
   }
 }
 

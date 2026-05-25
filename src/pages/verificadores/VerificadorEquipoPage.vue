@@ -4,8 +4,12 @@
       <div class="full-width flex justify-between q-mb-md">
         <q-btn v-bind="$theme.btn" color="white" text-color="primary" to="/verificadores" icon="sym_o_arrow_back"
           label="Regresar"></q-btn>
-        <q-btn v-bind="$theme.btn" icon="sym_o_save" color="primary" text-color="secondary" label="Guardar cambios"
-          @click="handleStore"></q-btn>
+        <div>
+          <q-btn v-bind="$theme.btn" class="q-mr-md" icon="sym_o_license" color="primary" text-color="secondary" label="Ir a asignación de folios"
+            :to="`/verificadores/asignacion-folios/${$router.currentRoute.value.params.id}`"></q-btn>
+          <q-btn v-bind="$theme.btn" icon="sym_o_save" color="primary" text-color="secondary" label="Guardar cambios"
+            @click="handleStore"></q-btn>
+        </div>
       </div>
       <div class="summary-container q-mb-md">
         <div>

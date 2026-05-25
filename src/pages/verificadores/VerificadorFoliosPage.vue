@@ -1,9 +1,17 @@
 <template>
   <q-page padding class="extended">
     <div style="max-width: 1440px; margin: auto">
-      <div class="full-width flex justify-start q-mb-md">
+      <div class="full-width flex justify-between q-mb-md">
         <q-btn v-bind="$theme.btn" color="white" text-color="primary" to="/verificadores" icon="sym_o_arrow_back"
           label="Regresar"></q-btn>
+          <q-btn
+            v-bind="$theme.btn"
+            color="primary"
+            text-color="secondary"
+            label="Ir a configuración de equipo"
+            icon="sym_o_manufacturing"
+            :to="`/verificadores/configuracion-equipo/${$router.currentRoute.value.params.id}`"
+          ></q-btn>
       </div>
       <div class="summary-container">
         <div>
