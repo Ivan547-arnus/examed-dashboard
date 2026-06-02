@@ -7,7 +7,7 @@ declare module "@vue/runtime-core" {
       imageUrl: (uuid: string) => string;
       date: (date: string) => string;
       dateTime: (date: string) => string;
-    },
+    };
     $theme: {
       btnIcon: QBtnProps;
       btn: QBtnProps;
@@ -15,8 +15,12 @@ declare module "@vue/runtime-core" {
       menu: Record<string, unknown>;
       input: Record<string, unknown>;
       card: Record<string, unknown>;
+      loading: Record<string, unknown>;
+    };
+    $utils: {
+      copyToClipboard: (text: string) => void;
     };
     $rules: IRules;
-    $router: Router
+    $router: Router;
   }
 }

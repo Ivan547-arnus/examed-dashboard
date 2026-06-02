@@ -2,15 +2,27 @@ import { defineBoot } from "#q-app/wrappers";
 import axios from "axios";
 import { Loading, LocalStorage, QSpinnerClock } from "quasar";
 import type { IResponse } from "src/types/IResponse";
+import { theme } from "./helpers";
 
-const api = axios.create({ baseURL: process.env.API_URL , headers: {
-  "Content-Type": "application/json",
-}});
+const api = axios.create({
+  baseURL: process.env.API_URL,
+  headers: {
+    "Content-Type": "application/json",
+  },
+});
+
+const hereApi = axios.create({
+  baseURL: process.env.HERE_API_URL,
+  headers: {
+    "Content-Type": "application/json",
+  },
+});
 
 export default defineBoot(() => {
   const token = LocalStorage.getItem("token");
   if (token) {
-    api.defaults.headers.common["Authorization"] = "Bearer " + (token as string);
+    api.defaults.headers.common["Authorization"] =
+      "Bearer " + (token as string);
   } else {
     api.defaults.headers.common["Authorization"] = "";
   }
@@ -20,16 +32,14 @@ const make = async <T, R = unknown>(
   endpoint: string,
   method: "POST" | "GET" | "PUT" | "DELETE",
   params?: R,
-  loading?: boolean | string
+  loading?: boolean | string,
 ) => {
   try {
-
     if (loading) {
       Loading.show({
-        spinner: QSpinnerClock,
-        spinnerSize: 38,
+        ...theme.loading,
         message: typeof loading === "string" ? loading : "Cargando...",
-      })
+      });
     }
 
     const methods = {
@@ -83,64 +93,64 @@ const make = async <T, R = unknown>(
 };
 
 const file = async <R = unknown>(
-    endpoint: string,
-    method: 'POST' | 'GET',
-    params?: R,
-    loadingMessage:boolean|string = false
+  endpoint: string,
+  method: "POST" | "GET",
+  params?: R,
+  loadingMessage: boolean | string = false,
 ) => {
-    if(loadingMessage) {
-        Loading.show({
-            message: typeof loadingMessage === 'string' ? loadingMessage : 'Cargando...',
-            spinner:QSpinnerClock,
-            spinnerSize: 38
-        })
+  if (loadingMessage) {
+    Loading.show({
+      message:
+        typeof loadingMessage === "string" ? loadingMessage : "Cargando...",
+      spinner: QSpinnerClock,
+      spinnerSize: 38,
+    });
+  }
+  try {
+    const methods = {
+      POST: async () => {
+        return await api.post(endpoint, params, {
+          responseType: "blob",
+        });
+      },
+      GET: async () => {
+        return await api.get(endpoint, {
+          responseType: "blob",
+        });
+      },
+    };
+    const request = await methods[method]();
+
+    if (loadingMessage) {
+      Loading.hide();
     }
-    try {
-        const methods = {
-            POST: async () => {
-                return await api.post(endpoint, params, {
-                    responseType: 'blob',
-                });
-            },
-            GET: async () => {
-                return await api.get(endpoint, {
-                    responseType: 'blob',
-                });
-            },
-        };
-        const request = await methods[method]();
 
-        if (loadingMessage) {
-            Loading.hide();
-        }
-
-        // En caso de que devuelva un json
-        const contentType = request.headers['content-type'];
-        if(contentType && contentType === 'application/json') {
-            const text = await request.data.text();
-            const json = JSON.parse(text);
-            return {
-                data: json,
-                type: 'application/json',
-            };
-        }
-
-        return {
-            data: request?.data,
-            type: 'blob',
-        };
-    } catch (err) {
-        console.log(err);
-        if (loadingMessage) {
-            Loading.hide();
-        }
-        return {
-            data: err,
-            error: true,
-            type: 'application/json',
-        };
+    // En caso de que devuelva un json
+    const contentType = request.headers["content-type"];
+    if (contentType && contentType === "application/json") {
+      const text = await request.data.text();
+      const json = JSON.parse(text);
+      return {
+        data: json,
+        type: "application/json",
+      };
     }
+
+    return {
+      data: request?.data,
+      type: "blob",
+    };
+  } catch (err) {
+    console.log(err);
+    if (loadingMessage) {
+      Loading.hide();
+    }
+    return {
+      data: err,
+      error: true,
+      type: "application/json",
+    };
+  }
 };
 
-
-export { api, make, file };
+export { api, make, file, hereApi };

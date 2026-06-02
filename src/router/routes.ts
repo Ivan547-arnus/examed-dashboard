@@ -64,7 +64,8 @@ const routes: RouteRecordRaw[] = [
           subtitle: "Lista de verificadores ExaMed",
           auth: true,
         },
-        component: () => import("pages/verificadores/VerificadoresListPage.vue"),
+        component: () =>
+          import("pages/verificadores/VerificadoresListPage.vue"),
       },
       {
         path: "editar/:id",
@@ -84,7 +85,8 @@ const routes: RouteRecordRaw[] = [
           subtitle: "Asignanación y configuración del equipo de trabajo",
           auth: true,
         },
-        component: () => import("pages/verificadores/VerificadorFoliosPage.vue"),
+        component: () =>
+          import("pages/verificadores/VerificadorFoliosPage.vue"),
       },
       {
         path: "configuracion-equipo/:id",
@@ -94,9 +96,10 @@ const routes: RouteRecordRaw[] = [
           subtitle: "Asignanación y configuración del equipo de trabajo",
           auth: true,
         },
-        component: () => import("pages/verificadores/VerificadorEquipoPage.vue"),
-      }
-    ]
+        component: () =>
+          import("pages/verificadores/VerificadorEquipoPage.vue"),
+      },
+    ],
   },
   {
     path: "/estaciones",
@@ -114,8 +117,45 @@ const routes: RouteRecordRaw[] = [
           auth: true,
         },
         component: () => import("pages/estaciones/EstacionesListPage.vue"),
-      }
-    ]
+      },
+      {
+        path: "editar/:id",
+        meta: {
+          title: "Editar estación",
+          subtitle: "Edita la información general de la estación",
+          auth: true,
+        },
+        component: () => import("pages/estaciones/EstacionFormPage.vue"),
+      },
+      {
+        path: "dispensarios/:id",
+        meta: {
+          title: "Estación / Dispensarios",
+          subtitle: "Configura los dispensarios de la estación",
+          auth: true,
+        },
+        component: () =>
+          import("pages/estaciones/EstacionDispensariosPage.vue"),
+      },
+    ],
+  },
+  {
+    path: "/tipos-combustible",
+    meta: {
+      title: "Tipos de combustible",
+    },
+    component: () => import("layouts/MainLayout.vue"),
+    children: [
+      {
+        name: "Tipos de combustible",
+        path: "",
+        meta: {
+          title: "Tipos de combustible",
+          auth: true,
+        },
+        component: () => import("pages/tipos-combustible/TiposCombustiblePage.vue"),
+      },
+    ],
   },
   {
     path: "/auth",

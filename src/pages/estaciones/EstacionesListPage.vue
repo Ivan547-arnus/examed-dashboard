@@ -1,144 +1,417 @@
 <template>
-  <q-page padding class="extended">
-    <div class="full-width flex justify-end">
-      <q-btn
-        v-bind="$theme.btn"
-        color="primary"
-        text-color="secondary"
-        icon="sym_o_local_gas_station"
-        label="Crear estación"
-      ></q-btn>
-    </div>
-    <q-table-component grid url="/stations">
-      <template v-slot:item="props">
-        <div class="q-pa-xs col-xs-12 col-sm-6 col-md-4 col-lg-3">
-          <q-card v-bind="$theme.card" class="station-card">
-            <q-card-section class="station-card__hero">
-              <div class="row items-start no-wrap q-col-gutter-md">
-                <div class="col">
-                  <div class="row items-start justify-between q-col-gutter-sm">
-                    <div class="col">
-                      <div class="text-h6 station-card__title">
-                        {{ getStationName(props.row.razon_social) }}
+  <q-page padding class="extended-xl">
+    <q-card v-bind="$theme.card" class="bg-transparent no-shadow">
+      <q-card-section class="q-px-none">
+        <div class="row q-col-gutter-md">
+          <div class="col-12 flex justify-end">
+            <div class="row justify-end q-col-gutter-md">
+              <div class="col-12 col-sm-auto flex justify-end">
+                <q-btn-group v-bind="$theme.btn">
+                  <q-btn
+                    v-bind="$theme.btn"
+                    :class="{
+                      'bg-primary': !stationStore.grid,
+                      'text-secondary': !stationStore.grid,
+                    }"
+                    label="Lista"
+                    icon="sym_o_view_list"
+                    @click="stationStore.grid = false"
+                  />
+                  <q-btn
+                    v-bind="$theme.btn"
+                    :class="{
+                      'bg-primary': stationStore.grid,
+                      'text-secondary': stationStore.grid,
+                    }"
+                    label="Cuadricula"
+                    icon="sym_o_grid_view"
+                    @click="stationStore.grid = true"
+                  />
+                </q-btn-group>
+              </div>
+              <div class="col-12 col-sm-auto flex justify-end">
+                <q-btn
+                  v-bind="$theme.btn"
+                  color="primary"
+                  text-color="secondary"
+                  icon="sym_o_local_gas_station"
+                  label="Crear estación"
+                  @click="preCreacionEstacionDialogRef?.open()"
+                >
+                </q-btn>
+              </div>
+            </div>
+          </div>
+          <q-input
+            v-bind="$theme.input"
+            class="col-12 col-sm-6 col-md-3"
+            dense
+            label="Busca por nombre o CRE"
+            clearable
+            debounce="1000"
+            @update:model-value="handleUpdateTable"
+            v-model="stationStore.search"
+          >
+            <template #append>
+              <q-icon name="sym_o_search" color="primary"></q-icon>
+            </template>
+          </q-input>
+          <q-fetch-select
+            v-bind="$theme.input"
+            class="col-12 col-sm-6 col-md-3"
+            dense
+            label="Selecciona un estado"
+            clearable
+            url="/utils/states"
+            option-label="nombre"
+            v-model="stationStore.state"
+            @update:model-value="
+              () => {
+                stationStore.municipality = null;
+                handleUpdateTable();
+              }
+            "
+          >
+          </q-fetch-select>
+          <q-fetch-select
+            v-bind="$theme.input"
+            class="col-12 col-sm-6 col-md-3"
+            dense
+            label="Selecciona un municipio"
+            clearable
+            :url="`/utils/municipalities/${stationStore.state?.id ?? ''}`"
+            option-label="nombre"
+            v-model="stationStore.municipality"
+            :disable="!stationStore.state"
+            @update:model-value="handleUpdateTable()"
+          >
+          </q-fetch-select>
+          <div class="col-3 flex justify-end"></div>
+        </div>
+      </q-card-section>
+    </q-card>
+    <q-card
+      v-bind="$theme.card"
+      class="full-width"
+      :class="{
+        'bg-transparent no-shadow': stationStore.grid,
+      }"
+    >
+      <q-table-component
+        class="border-xs-radius"
+        table-header-class="text-h6 bg-primary text-secondary"
+        :grid="stationStore.grid"
+        url="/stations"
+        v-model:pagination="pagination"
+        :columns="columns"
+        ref="stationTableRef"
+        v-model:search="stationStore.search"
+        :request-data="tableRequestData"
+      >
+        <template #body-cell-actions="props">
+          <q-td v-bind="props">
+            <q-btn outline v-bind="$theme.btnIcon" icon="sym_o_more_vert" flat>
+              <q-menu v-bind="$theme.menu">
+                <q-list>
+                  <q-item clickable v-ripple>
+                    <q-item-section avatar>
+                      <q-icon name="sym_o_add_notes"></q-icon>
+                    </q-item-section>
+                    <q-item-section>
+                      <q-item-label>Crear solicitud</q-item-label>
+                    </q-item-section>
+                  </q-item>
+                  <q-item
+                    clickable
+                    v-ripple
+                    :to="`/estaciones/editar/${props.row.id}`"
+                  >
+                    <q-item-section avatar>
+                      <q-icon name="sym_o_edit_square"></q-icon>
+                    </q-item-section>
+                    <q-item-section>
+                      <q-item-label>Editar estación</q-item-label>
+                    </q-item-section>
+                  </q-item>
+                  <q-item
+                    clickable
+                    v-ripple
+                    :to="`/estaciones/dispensarios/${props.row.id}`"
+                  >
+                    <q-item-section avatar>
+                      <q-icon name="sym_o_edit_square"></q-icon>
+                    </q-item-section>
+                    <q-item-section>
+                      <q-item-label>Configurar dispensarios</q-item-label>
+                    </q-item-section>
+                  </q-item>
+                </q-list>
+              </q-menu>
+            </q-btn>
+          </q-td>
+        </template>
+        <template #no-data>
+          <div class="no-items text-primary">
+            <q-avatar v-bind="$theme.avatar" color="grey-3" size="78px">
+              <q-icon name="sym_o_info" color="primary" size="1.25em"></q-icon>
+            </q-avatar>
+            <span class="text-h6">
+              Oops, lo sentimos pero no se encontraron estaciones
+            </span>
+            <span class="text-caption">
+              Crea una nueva estación para comenzar
+            </span>
+            <q-btn
+              v-bind="$theme.btn"
+              icon="sym_o_add"
+              color="primary"
+              text-color="secondary"
+              label="Crear estación"
+              @click="preCreacionEstacionDialogRef?.open()"
+            ></q-btn>
+          </div>
+        </template>
+        <template v-slot:item="props">
+          <div class="q-pa-xs col-xs-12 col-sm-6 col-md-4 col-lg-3">
+            <q-card v-bind="$theme.card" class="station-card">
+              <q-card-section class="station-card__hero bg-grey-4">
+                <div class="row items-start no-wrap q-col-gutter-xs">
+                  <div class="col">
+                    <div
+                      class="row items-start justify-between q-col-gutter-sm"
+                    >
+                      <div class="col">
+                        <div class="text-bold station-card__title">
+                          {{ props.row.razon_social ?? "-" }}
+                        </div>
                       </div>
                     </div>
+                    <div class="station-card__location">
+                      <q-icon name="sym_o_location_on" size="18px" />
+                      <span
+                        >{{ props.row.municipality.nombre }},
+                        {{ props.row.state.nombre }}</span
+                      >
+                    </div>
                   </div>
-                  <div class="station-card__location">
-                    <q-icon name="sym_o_location_on" size="18px" />
-                    <span>{{ formatLocation(props.row) }}</span>
+                  <div class="col-auto">
+                    <q-btn
+                      v-bind="$theme.btnIcon"
+                      flat
+                      dense
+                      icon="sym_o_more_vert"
+                    >
+                      <q-menu v-bind="$theme.menu">
+                        <q-list>
+                          <q-item
+                            clickable
+                            v-ripple
+                            :to="`/estaciones/editar/${props.row.id}`"
+                          >
+                            <q-item-section avatar>
+                              <q-icon name="sym_o_edit_square"></q-icon>
+                            </q-item-section>
+                            <q-item-section>
+                              <q-item-label>Editar estación</q-item-label>
+                            </q-item-section>
+                          </q-item>
+                          <q-item
+                            clickable
+                            v-ripple
+                            :to="`/estaciones/dispensarios/${props.row.id}`"
+                          >
+                            <q-item-section avatar>
+                              <q-icon name="sym_o_local_gas_station"></q-icon>
+                            </q-item-section>
+                            <q-item-section>
+                              <q-item-label>
+                                Configurar dispensarios
+                              </q-item-label>
+                            </q-item-section>
+                          </q-item>
+                        </q-list>
+                      </q-menu>
+                    </q-btn>
                   </div>
                 </div>
-                <div class="col-auto">
-                  <q-btn
-                    v-bind="$theme.btnIcon"
-                    flat
-                    icon="sym_o_more_vert"
-                  ></q-btn>
-                </div>
-              </div>
-            </q-card-section>
+              </q-card-section>
 
-            <q-card-section class="q-pt-md">
-              <div class="station-card__info-list">
-                <div class="station-card__info-item">
-                  <q-icon name="sym_o_assignment" size="20px" color="primary" />
+              <q-card-section class="q-pt-md">
+                <div class="station-card__info-list">
+                  <q-item class="full-width bg-grey-4 border-md-radius">
+                    <q-item-section
+                      avatar
+                      class="q-pa-none"
+                      style="min-width: 36px"
+                    >
+                      <q-icon name="sym_o_assignment" color="primary" />
+                    </q-item-section>
+                    <q-item-section>
+                      <q-item-label caption>Permiso CRE</q-item-label>
+                      <q-item-label>{{ props.row.cre }}</q-item-label>
+                    </q-item-section>
+                    <q-item-section side>
+                      <q-btn
+                        v-bind="$theme.btn"
+                        @click="$utils.copyToClipboard(props.row.cre)"
+                        dense
+                        flat
+                        icon="sym_o_content_copy"
+                      ></q-btn>
+                    </q-item-section>
+                  </q-item>
+
+                  <q-item class="full-width bg-grey-4 border-md-radius">
+                    <q-item-section
+                      avatar
+                      class="q-pa-none"
+                      style="min-width: 36px"
+                    >
+                      <q-icon name="sym_o_pin_drop" color="primary" />
+                    </q-item-section>
+                    <q-item-section>
+                      <q-item-label caption>Dirección</q-item-label>
+                      <q-item-label>{{
+                        props.row.formatted_address ?? "-"
+                      }}</q-item-label>
+                    </q-item-section>
+                    <q-item-section side>
+                      <q-btn
+                        v-bind="$theme.btn"
+                        @click="
+                          $utils.copyToClipboard(props.row.formatted_address)
+                        "
+                        dense
+                        flat
+                        icon="sym_o_content_copy"
+                      ></q-btn>
+                    </q-item-section>
+                  </q-item>
+                </div>
+              </q-card-section>
+
+              <q-separator />
+
+              <q-card-section class="station-card__footer">
+                <div class="station-card__verification">
+                  <q-icon name="sym_o_fact_check" size="22px" color="primary" />
                   <div>
-                    <div class="station-card__label">Permiso CRE</div>
-                    <div class="station-card__value">{{ formatCre(props.row.cre) }}</div>
+                    <div class="station-card__label">Última verificación</div>
+                    <div class="station-card__value">
+                      Sin registro disponible
+                    </div>
+                    <div class="station-card__hint">
+                      Crea una solicitud para comenzar el seguimiento de esta
+                      estación.
+                    </div>
                   </div>
                 </div>
 
-                <div class="station-card__info-item">
-                  <q-icon name="sym_o_pin_drop" size="20px" color="primary" />
-                  <div>
-                    <div class="station-card__label">Dirección</div>
-                    <div class="station-card__value">{{ formatAddress(props.row) }}</div>
-                  </div>
-                </div>
-              </div>
-            </q-card-section>
-
-            <q-separator />
-
-            <q-card-section class="station-card__footer">
-              <div class="station-card__verification">
-                <q-icon name="sym_o_fact_check" size="22px" color="primary" />
-                <div>
-                  <div class="station-card__label">Última verificación</div>
-                  <div class="station-card__value">Sin registro disponible</div>
-                  <div class="station-card__hint">
-                    Crea una solicitud para comenzar el seguimiento de esta estación.
-                  </div>
-                </div>
-              </div>
-
-              <q-btn
-                v-bind="$theme.btn"
-                color="primary"
-                text-color="secondary"
-                class="full-width station-card__action"
-              >
-                Crear solicitud
-              </q-btn>
-            </q-card-section>
-          </q-card>
-        </div>
-      </template>
-    </q-table-component>
+                <q-btn
+                  v-bind="$theme.btn"
+                  icon="sym_o_add_notes"
+                  color="primary"
+                  text-color="secondary"
+                  class="full-width station-card__action"
+                  label="Crear solicitud"
+                >
+                </q-btn>
+              </q-card-section>
+            </q-card>
+          </div>
+        </template>
+      </q-table-component>
+    </q-card>
+    <PreCreacionEstacionDialog ref="preCreacionEstacionDialogRef" />
   </q-page>
 </template>
 
 <script setup lang="ts">
-import QTableComponent from 'src/components/QTableComponent.vue';
-
-type NullableText = null | string | number | undefined;
-
-interface StationRow {
-  razon_social?: NullableText;
-  cre?: NullableText;
-  calle?: NullableText;
-  colonia?: NullableText;
-  cp?: NullableText;
-  municipality?: {
-    nombre?: NullableText;
-  } | null;
-  state?: {
-    nombre?: NullableText;
-  } | null;
-}
-
-
-function normalizeText(value: NullableText) {
-  if (value === null || value === undefined) return '';
-
-  return String(value).trim();
-}
-
-function getStationName(name: NullableText) {
-  return normalizeText(name) || 'Sin razón social';
-}
-
-function formatCre(cre: NullableText) {
-  return normalizeText(cre) || 'Sin permiso registrado';
-}
-
-
-function formatLocation(row: StationRow) {
-  const location = [row.municipality?.nombre, row.state?.nombre]
-    .map(normalizeText)
-    .filter(Boolean);
-
-  return location.join(', ') || 'Ubicación no disponible';
-}
-
-function formatAddress(row: StationRow) {
-  const address = [row.calle, row.colonia].map(normalizeText).filter(Boolean);
-
-  if (row.cp) {
-    address.push(`C.P. ${normalizeText(row.cp)}`);
+import QTableComponent from "src/components/QTableComponent.vue";
+import { useStation } from "src/stores/station-store";
+import type { IStation } from "src/types/IStation";
+import { computed, ref } from "vue";
+import PreCreacionEstacionDialog from "src/pages/estaciones/components/PreCreacionEstacionDialog.vue";
+import QFetchSelect from "src/components/QFetchSelect.vue";
+import { nextTick } from "vue";
+const stationTableRef = ref<{ refresh: () => void } | null>(null);
+const pagination = ref({
+  page: 1,
+  rowsPerPage: 12,
+  sortBy: null,
+  descending: false,
+  rowsNumber: 0,
+});
+const preCreacionEstacionDialogRef = ref<{ open: () => void } | null>(null);
+const tableRequestData = computed(() => {
+  const filters = [];
+  if (stationStore.state) {
+    filters.push({
+      key: "id_state",
+      operator: "=",
+      value: stationStore.state.id,
+    });
   }
 
-  return address.join(', ') || 'Dirección no disponible';
+  if (stationStore.municipality) {
+    filters.push({
+      key: "id_municipality",
+      operator: "=",
+      value: stationStore.municipality.id,
+    });
+  }
+  return { filters };
+});
+
+const columns = [
+  {
+    name: "cre",
+    field: "cre",
+    label: "Permiso CRE",
+    align: "left",
+    searchable: true,
+    sortable: false,
+  },
+  {
+    name: "razon_social",
+    field: "razon_social",
+    label: "Razón social",
+    align: "left",
+    searchable: true,
+    sortable: false,
+  },
+  {
+    name: "state",
+    field: (row: IStation) =>
+      row.state?.nombre + ", " + row.municipality?.nombre,
+    label: "Estado - Municipio",
+    align: "left",
+    searchable: false,
+    sortable: false,
+  },
+  {
+    name: "formatted_address",
+    field: "formatted_address",
+    label: "Dirección",
+    align: "left",
+    searchable: false,
+    sortable: false,
+  },
+  {
+    name: "actions",
+    field: "actions",
+    label: "Acciones",
+    align: "right",
+    searchable: false,
+    sortable: false,
+  },
+];
+
+const stationStore = useStation();
+
+async function handleUpdateTable() {
+  await nextTick();
+  stationTableRef.value?.refresh();
 }
 </script>
 
@@ -146,8 +419,13 @@ function formatAddress(row: StationRow) {
 .station-card {
   height: 100%;
   overflow: hidden;
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: auto auto auto auto;
   border: 1px solid rgba(15, 23, 42, 0.08);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
 }
 
 .station-card:hover {
@@ -259,5 +537,18 @@ function formatAddress(row: StationRow) {
 
 .station-card__action {
   min-height: 42px;
+}
+
+.no-items {
+  width: 100%;
+  height: 100%;
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  justify-content: center;
+  align-items: center;
+  margin-top: 27.5vh;
+  margin-bottom: 27.5vh;
 }
 </style>

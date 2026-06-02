@@ -1,29 +1,57 @@
 <template>
   <q-layout view="lHh LpR lFf" class="bg-grey-1">
     <q-header class="bg-secondary" height-hint="98" bordered>
-      <q-toolbar style="height: 60px;">
-        <q-btn v-bind="$theme.btnIcon" flat color="dark" @click="menuDrawer = !menuDrawer">
+      <q-toolbar style="height: 60px">
+        <q-btn
+          v-bind="$theme.btnIcon"
+          flat
+          color="dark"
+          @click="menuDrawer = !menuDrawer"
+        >
           <q-icon name="sym_o_menu"></q-icon>
         </q-btn>
         <q-toolbar-title v-if="$q.screen.gt.xs">
-          <p class="text-dark text-h5 q-ma-none">{{ $router.currentRoute.value.meta.title }}</p>
-          <p class="text-dark text-caption q-ma-none" v-if="$router.currentRoute.value.meta.subtitle">{{ $router.currentRoute.value.meta.subtitle }}</p>
+          <p class="text-dark text-h5 q-ma-none">
+            {{ $router.currentRoute.value.meta.title }}
+          </p>
+          <p
+            class="text-dark text-caption q-ma-none"
+            v-if="$router.currentRoute.value.meta.subtitle"
+          >
+            {{ $router.currentRoute.value.meta.subtitle }}
+          </p>
         </q-toolbar-title>
         <q-space></q-space>
         <q-btn padding="xs sm" v-bind="$theme.btn" no-caps flat color="white">
-          <q-avatar v-bind="$theme.avatar" size="40px" color="dark" class="q-mr-sm" round>
+          <q-avatar
+            v-bind="$theme.avatar"
+            size="40px"
+            color="dark"
+            class="q-mr-sm"
+            round
+          >
             <q-icon name="sym_o_person" color="secondary" size="1.2em"></q-icon>
           </q-avatar>
           <q-item class="text-dark">
             <q-item-section class="q-mr-sm">
-              <q-item-label class="text-dark text-left" caption>Bienvenido</q-item-label>
-              <q-item-label>{{ auth.user?.name }} {{ auth.user?.lastname }} {{ auth.user?.second_lastname }} </q-item-label>
+              <q-item-label class="text-dark text-left" caption
+                >Bienvenido</q-item-label
+              >
+              <q-item-label
+                >{{ auth.user?.name }} {{ auth.user?.lastname }}
+                {{ auth.user?.second_lastname }}
+              </q-item-label>
             </q-item-section>
           </q-item>
           <q-icon color="dark" name="sym_o_expand_more"></q-icon>
           <q-menu v-bind="$theme.menu">
-            <q-list style="min-width: 180px;" class="border-xs-radius">
-              <q-item clickable v-ripple @click="handleLogout" class="text-negative">
+            <q-list style="min-width: 180px" class="border-xs-radius">
+              <q-item
+                clickable
+                v-ripple
+                @click="handleLogout"
+                class="text-negative"
+              >
                 <q-item-section avatar>
                   <q-avatar v-bind="$theme.avatar" color="negative">
                     <q-icon name="sym_o_logout" color="white"></q-icon>
@@ -37,18 +65,37 @@
       </q-toolbar>
     </q-header>
 
-    <q-drawer show-if-above v-model="menuDrawer"  class="bg-dark" side="left" :width="280">
+    <q-drawer
+      show-if-above
+      v-model="menuDrawer"
+      class="bg-dark"
+      side="left"
+      :width="280"
+    >
       <div class="menu-container">
         <div class="menu-icon">
-          <q-img no-spinner src="~assets/logo-horizontal.png" ratio="1 / 1" fit="contain" class="full-width" style="max-height: 120px;"></q-img>
+          <q-img
+            no-spinner
+            src="~assets/logo-horizontal.png"
+            ratio="1 / 1"
+            fit="contain"
+            class="full-width"
+            style="max-height: 120px"
+          ></q-img>
         </div>
         <q-scroll-area>
           <q-list class="q-pa-md">
-            <essential-link v-for="item in auth.menu" :key="item.title" v-bind="item" />
+            <essential-link
+              v-for="item in auth.menu"
+              :key="item.title"
+              v-bind="item"
+            />
           </q-list>
         </q-scroll-area>
         <div class="q-pa-md menu-footer">
-          <p class="text-caption text-center q-my-none text-white">Hecho con ❤️ y ☕.</p>
+          <p class="text-caption text-center q-my-none text-white">
+            Hecho con ❤️ y ☕.
+          </p>
         </div>
       </div>
     </q-drawer>
@@ -60,31 +107,39 @@
 </template>
 
 <script lang="ts" setup>
-import { useMeta, useQuasar } from 'quasar';
-import { theme } from 'src/boot/helpers';
-import EssentialLink from 'src/components/EssentialLink.vue';
-import { question } from 'src/config/dialog';
-import { useAuth } from 'src/stores/auth-store';
-import { computed, ref } from 'vue';
-import { useRouter } from 'vue-router';
+import { useMeta, useQuasar } from "quasar";
+import { theme } from "src/boot/helpers";
+import EssentialLink from "src/components/EssentialLink.vue";
+import { question } from "src/config/dialog";
+import { useAuth } from "src/stores/auth-store";
+import { computed, ref } from "vue";
+import { useRouter } from "vue-router";
 const $q = useQuasar();
-const router = useRouter()
-const title = computed(() => 'Examed | Dashboard | ' + (router.currentRoute.value.meta.title as string))
+const router = useRouter();
+const title = computed(
+  () =>
+    "Examed | Dashboard | " + (router.currentRoute.value.meta.title as string),
+);
 useMeta(() => ({
   title: title.value,
-}))
-const auth = useAuth()
-const menuDrawer = ref(false)
-
+}));
+const auth = useAuth();
+const menuDrawer = ref(false);
 
 async function handleLogout() {
-  const answer = await question('Sesión', '<span class="text-bold">¿Desea cerrar sesión?</span>', { type: 'negative', ok: { ...theme.btn, label: 'Cerrar sesión', color: 'negative' } });
+  const answer = await question(
+    "Sesión",
+    '<span class="text-bold">¿Desea cerrar sesión?</span>',
+    {
+      type: "negative",
+      ok: { ...theme.btn, label: "Cerrar sesión", color: "negative" },
+    },
+  );
   if (!answer) return;
   auth.logout();
-  void router.push('/auth');
+  void router.push("/auth");
 }
 </script>
-
 
 <style scoped lang="scss">
 .menu-icon {
@@ -110,16 +165,35 @@ async function handleLogout() {
 </style>
 
 <style lang="scss">
-.q-page.extended::before {
-  position: absolute;
-  top: 0;
-  content: '';
-  background-color: $secondary !important;
-  height: 160px !important;
-  width: 100%;
-  left: 0;
-  padding: inherit;
-  border-bottom-left-radius: 12px;
-  border-bottom-right-radius: 12px;
+.q-page {
+  &.extended {
+    &::before {
+      position: absolute;
+      top: 0;
+      content: "";
+      background-color: $secondary !important;
+      height: 160px !important;
+      width: 100%;
+      left: 0;
+      padding: inherit;
+      border-bottom-left-radius: 12px;
+      border-bottom-right-radius: 12px;
+    }
+  }
+
+  &.extended-xl {
+    &::before {
+      position: absolute;
+      top: 0;
+      content: "";
+      background-color: $secondary !important;
+      height: 320px !important;
+      width: 100%;
+      left: 0;
+      padding: inherit;
+      border-bottom-left-radius: 12px;
+      border-bottom-right-radius: 12px;
+    }
+  }
 }
 </style>
