@@ -1,3 +1,5 @@
+import type { IVerifierConfig } from "./IVerifier";
+
 export interface IUser {
   id: number | null;
   name: string;
@@ -9,10 +11,12 @@ export interface IUser {
   username: string;
   created_at?: string;
   updated_at?: string;
+  verifier_data?: IVerifierConfig | null;
 }
 
 export class User implements IUser {
   id: number | null = null;
+  no_interno: number | null = null;
   name: string = '';
   lastname: string = '';
   second_lastname: string = '';
@@ -27,6 +31,7 @@ export class User implements IUser {
   show_password_confirmation: boolean = false;
   created_at?: string = '';
   updated_at?: string = '';
+  verifier_data?: IVerifierConfig | null = null;
   constructor(data?: IUser) {
     if (data) {
       Object.assign(this, data);

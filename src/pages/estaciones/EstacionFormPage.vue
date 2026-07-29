@@ -9,8 +9,8 @@
       icon="sym_o_arrow_back"
       @click="() => void router.push('/estaciones')"
     ></q-btn>
-    <div class="row q-mb-md q-col-gutter-md items-stretch">
-      <div class="col-12 col-md-4">
+    <div class="row q-mb-md q-col-gutter-md items-stretch justify-between">
+      <div class="col-12 col-lg-4 col-md-6" v-if="currentVerification">
         <q-card v-bind="$theme.card" class="verification-summary-card">
           <q-card-section class="verification-summary-card__content">
             <div
@@ -20,10 +20,97 @@
             </div>
             <div class="verification-summary-card__body">
               <div class="text-h6 verification-summary-card__title">
-                <span>Verificación actual</span>
+                <span>Verificación actual - {{ currentVerification.folio }}</span>
+                <q-chip
+                  v-if="currentVerification.estatus"
+                  dense
+                  square
+                  :color="statusChip.color"
+                  :text-color="statusChip.textColor"
+                  :icon="statusChip.icon"
+                  :label="currentVerification.estatus"
+                ></q-chip>
               </div>
               <div class="verification-summary-card__description">
-                Actualmente no tiene una solicitud de verificación activa.
+                Actualmente tiene una solicitud de verificación en curso.
+              </div>
+            </div>
+          </q-card-section>
+          <q-separator />
+          <q-expansion-item
+            label="Detalles de la solicitud"
+            icon="sym_o_info"
+            header-class="text-primary text-weight-bold"
+            expand-icon-class="text-primary"
+          >
+            <q-card-section >
+              <div class="verification-summary-card__details">
+                <div class="verification-summary-card__detail">
+                  <div class="verification-summary-card__detail-label">
+                    Folio
+                  </div>
+                  <div class="verification-summary-card__detail-value">
+                    {{ currentVerification.folio || "Sin folio" }}
+                  </div>
+                </div>
+                <div class="verification-summary-card__detail">
+                  <div class="verification-summary-card__detail-label">
+                    Tipo
+                  </div>
+                  <div class="verification-summary-card__detail-value">
+                    {{ currentVerification.tipo || "Sin tipo" }}
+                  </div>
+                </div>
+                <div class="verification-summary-card__detail">
+                  <div class="verification-summary-card__detail-label">
+                    Fecha de solicitud
+                  </div>
+                  <div class="verification-summary-card__detail-value">
+                    {{
+                      currentVerification.fecha_solicitud
+                        ? $filters.date(currentVerification.fecha_solicitud)
+                        : "Sin fecha"
+                    }}
+                  </div>
+                </div>
+                <div class="verification-summary-card__detail">
+                  <div class="verification-summary-card__detail-label">
+                    Total
+                  </div>
+                  <div class="verification-summary-card__detail-value">
+                    {{ $filters.currency(currentVerification.total ?? 0) }}
+                  </div>
+                </div>
+              </div>
+            </q-card-section>
+          </q-expansion-item>
+          <q-separator />
+          <q-card-actions align="right" class="q-pa-md">
+            <q-btn
+              v-bind="$theme.btn"
+              :to="`/verificaciones/${currentVerification.id}`"
+              label="Ver solicitud"
+              icon-right="sym_o_arrow_forward"
+            ></q-btn>
+          </q-card-actions>
+        </q-card>
+      </div>
+
+      <div class="col-12 col-lg-4 col-md-6" v-else>
+        <q-card v-bind="$theme.card" class="verification-summary-card">
+          <q-card-section class="verification-summary-card__content">
+            <div
+              class="verification-summary-card__icon bg-primary text-secondary"
+            >
+              <q-icon name="sym_o_fact_check" size="26px"></q-icon>
+            </div>
+            <div class="verification-summary-card__body">
+              <div class="text-h6 verification-summary-card__title">
+                <span>Sin verificación en curso</span>
+              </div>
+              <div class="verification-summary-card__description">
+                Esta estación no tiene una solicitud de verificación activa.
+                Crea una nueva solicitud para iniciar el proceso.
               </div>
             </div>
           </q-card-section>
@@ -31,14 +118,17 @@
           <q-card-actions align="right" class="q-pa-md">
             <q-btn
               v-bind="$theme.btn"
+              @click="handleCreateVerification()"
+              color="primary"
+              text-color="secondary"
+              icon="sym_o_add_notes"
               label="Crear solicitud"
-              icon-right="sym_o_arrow_forward"
             ></q-btn>
           </q-card-actions>
         </q-card>
       </div>
 
-      <div class="col-12 col-md-4">
+      <!-- <div class="col-12 col-md-4">
         <q-card v-bind="$theme.card" class="verification-summary-card">
           <q-card-section class="verification-summary-card__content">
             <div
@@ -75,7 +165,7 @@
             ></q-btn>
           </q-card-actions>
         </q-card>
-      </div>
+      </div> -->
 
       <div class="col-12 col-md-4">
         <q-card v-bind="$theme.card" class="station-actions-card">
@@ -314,14 +404,24 @@
 <script setup lang="ts">
 import QFetchSelect from "src/components/QFetchSelect.vue";
 import { useStation } from "src/stores/station-store";
+import { verificationStatusChip } from "src/types/IVerification";
 import L from "leaflet";
-import { nextTick, onMounted, onUnmounted, ref } from "vue";
+import { computed, nextTick, onMounted, onUnmounted, ref } from "vue";
 import "leaflet/dist/leaflet.css";
 import { useRouter } from "vue-router";
 import { alert, question } from "src/config/dialog";
 import { utils } from "src/boot/helpers";
 import CoordenadasDialog from "src/pages/estaciones/components/CoordenadasDialog.vue";
 import { useQuasar } from "quasar";
+import markerIcon2x from 'leaflet/dist/images/marker-icon-2x.png'
+import markerIcon from 'leaflet/dist/images/marker-icon.png'
+import markerShadow from 'leaflet/dist/images/marker-shadow.png'
+
+L.Icon.Default.mergeOptions({
+  iconRetinaUrl: markerIcon2x,
+  iconUrl: markerIcon,
+  shadowUrl: markerShadow,
+})
 const $q = useQuasar();
 const mapContainer = ref(null);
 const coordenadasDialogRef = ref<InstanceType<typeof CoordenadasDialog> | null>(
@@ -330,6 +430,14 @@ const coordenadasDialogRef = ref<InstanceType<typeof CoordenadasDialog> | null>(
 let map: L.Map | null = null;
 const stationStore = useStation();
 const router = useRouter();
+
+const currentVerification = computed(
+  () => stationStore.station.current_verification,
+);
+
+const statusChip = computed(() =>
+  verificationStatusChip(currentVerification.value?.estatus),
+);
 const ZOOM_LEVEL = 17;
 const markers: L.Marker[] = [];
 
@@ -348,8 +456,14 @@ async function handleGeocode() {
   }
 }
 
-async function setDataLocation(data: [number, number]) {
+async function setDataLocation(data: [number, number], utm = null) {
   stationStore.station.cordenadas_gps = data.join(",");
+  // Si viene UTM la usamos tal cual sino la calculamos con las cordenadas recibidas
+  if (utm) {
+    stationStore.station.cordenadas_gps = utm;
+  } else {
+    stationStore.station.cordenadas_utm = utils.gpsToUTM(data);
+  }
   await nextTick();
   const currentMap = startMap();
   if (currentMap) {
@@ -434,6 +548,26 @@ onUnmounted(() => {
     map.remove();
   }
 });
+
+async function handleCreateVerification() {
+  const answer = await question(
+    "Crear solicitud",
+    "¿Seguro que deseas crear una solicitud de verificación para la estación seleccionada?",
+    {
+      type: "info",
+    },
+  );
+  if (!answer) return;
+  const { error, message, data } = await stationStore.creteVerification(stationStore.station.id);
+  if (error) {
+    void alert("Error", message, {
+      type: "negative",
+    });
+    return;
+  } else {
+    void router.push(`/verificaciones/${data?.id}`);
+  }
+}
 </script>
 
 <style lang="scss" scoped>
@@ -491,6 +625,26 @@ onUnmounted(() => {
   color: rgba(15, 23, 42, 0.68);
   font-size: 0.9rem;
   line-height: 1.4;
+}
+
+.verification-summary-card__details {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px 14px;
+}
+
+.verification-summary-card__detail-label {
+  font-size: 0.74rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: rgba(15, 23, 42, 0.56);
+}
+
+.verification-summary-card__detail-value {
+  color: #132238;
+  font-size: 0.9rem;
+  font-weight: 600;
 }
 
 .station-actions-card__actions {

@@ -5,6 +5,7 @@
     v-ripple
     class="border-md-radius q-mt-sm item-class text-dark"
     active-class="text-dark active-class"
+    exact
     @click="handleExpand"
   >
     <q-item-section avatar>

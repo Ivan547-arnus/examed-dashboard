@@ -30,6 +30,8 @@ export const volBrands = [
 
 export interface IVerifierConfig {
   id: number | null;
+  no_interno: number | null;
+  no_interno_formatted: string | null;
   v20: number | null;
   kc: number | null;
   alpha: number | null;
@@ -56,6 +58,8 @@ export interface IVerifierMaterial {
 
 export class VerifierConfig implements IVerifierConfig {
   id: number | null = null;
+  no_interno: number | null = null;
+  no_interno_formatted: string | null = null;
   v20: number | null = null;
   kc: number | null = null;
   alpha: number | null = null;

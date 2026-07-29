@@ -2,6 +2,7 @@ import { defineStore } from "pinia";
 import { hereApi, make } from "src/boot/axios";
 import type { IState, IMunicipality } from "src/types/IState";
 import { type IStation, Station } from "src/types/IStation";
+import { type IVerification, Verification } from "src/types/IVerification";
 
 export const useStation = defineStore("useStationStore", {
   state: () => ({
@@ -137,5 +138,24 @@ export const useStation = defineStore("useStationStore", {
         };
       }
     },
+    async creteVerification(stationId: number) {
+      try {
+        const {
+          data: { message, error, data },
+        } = await make<IVerification>(`stations/${stationId}/create-verification`, 'POST', {})
+        return {
+          error: error,
+          message: message,
+          data: new Verification(data),
+        };
+      } catch (error) {
+        console.error(error);
+        return {
+          error: true,
+          message: "Ha ocurrido un error al crear la verificación",
+          data: null,
+        };
+      }
+    }
   },
 });

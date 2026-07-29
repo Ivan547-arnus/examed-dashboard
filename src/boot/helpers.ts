@@ -1,4 +1,5 @@
 import { defineBoot } from "@quasar/app-vite/wrappers";
+import proj4 from "proj4";
 import { Loading, QSpinnerClock } from "quasar";
 import { CreateNotify } from "src/config/notify";
 import dayjs from "src/plugins/dayjs";
@@ -26,6 +27,7 @@ const theme = {
     color: "dark",
     bgColor: "white",
     class: "text-dark border-md-radius",
+    clearIcon:"sym_o_close"
   },
   card: {
     class: "border-md-radius shadow-1",
@@ -136,6 +138,70 @@ const utils = {
   hideLoading: () => {
     Loading.hide();
   },
+  gpsToUTM: (coords: [number, number]) => {
+    const [lat, lng] = coords;
+    const zone = Math.floor((lng + 180) / 6) + 1;
+    const hemisphere = lat >= 0 ? "N" : "S";
+
+    const wgs84 = "+proj=longlat +datum=WGS84 +no_defs";
+    const utmProj = `+proj=utm +zone=${zone} +${
+      hemisphere === "N" ? "north" : "south"
+    } +ellps=WGS84 +datum=WGS84 +units=m +no_defs`;
+
+    const [easting, northing] = proj4(wgs84, utmProj, [lng, lat]);
+
+    return `${zone}${hemisphere} ${Math.round(easting)} ${Math.round(northing)}`;
+  },
+  formatRemainingDays:(fechaVencimiento: null | string, type?:'termometro' | 'medida') => {
+    let prefix = '';
+    if(type) {
+      const types = {
+        'termometro': 'Cal. ter. - ',
+        'medida': 'Cal. med. vol. - '
+      }
+
+      prefix = types[type] ?? '';
+    }
+
+    if (!fechaVencimiento) {
+      return {
+        color: 'grey-3',
+        textColor: 'grey-9',
+        dense: true,
+        label: prefix + 'Sin calibraciones'
+      }
+    }
+
+    const today = dayjs();
+    const remainingDays = dayjs(fechaVencimiento).diff(today, 'days');
+
+    if (remainingDays < 30) {
+      return {
+        color: 'red-1',
+        textColor: 'red-9',
+        dense: true,
+        label: remainingDays < 0 ? `${prefix}Vencio hace ${Math.abs(remainingDays)} dias` : `${prefix}Vence en ${Math.abs(remainingDays)} dias`
+      }
+    }
+
+    if (remainingDays < 90) {
+      return {
+        remainingDays,
+        color: 'yellow-1',
+        textColor: 'yellow-9',
+        dense: true,
+        label: `${prefix}Vence en ${Math.abs(remainingDays)} dias`
+      }
+    }
+
+    return {
+      remainingDays,
+      color: 'green-1',
+      textColor: 'green-9',
+      dense: true,
+      label: `${prefix}Vence en ${Math.abs(remainingDays)} dias`
+    }
+  }
 };
 
 export default defineBoot(({ app }) => {

@@ -16,6 +16,8 @@
           </q-item>
           <q-card-section>
             <q-form id="verificador-form" class="row q-col-gutter-md" @submit.prevent="onSubmit">
+              <q-input v-bind="$theme.input" v-if="state.user.verifier_data" v-model="state.user.verifier_data.no_interno"
+                label="No. interno" class="col-12" mask="###" unmasked-value ></q-input>
               <q-input v-bind="$theme.input" v-model="state.user.name" :rules="[$rules.required('Campo requerido')]"
                 label="Nombre" class="col-12"></q-input>
               <q-input v-bind="$theme.input" v-model="state.user.lastname" :rules="[$rules.required('Campo requerido')]"

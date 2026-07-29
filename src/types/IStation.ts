@@ -1,4 +1,5 @@
 import type { IState, IMunicipality } from "./IState";
+import { Verification, type IVerification } from "./IVerification";
 
 export const fuelOptions = ["Magna", "Premium", "Diesel"];
 export const hoseOptions = ["A", "B", "C", "D", "E", "F"];
@@ -29,6 +30,7 @@ export interface IDispenser {
   created_at?: string | null;
   updated_at?: string | null;
   deleted_at?: string | null;
+  hoses_count?: number;
   hoses: IDispenserHose[];
 }
 
@@ -70,6 +72,7 @@ export class Station implements IStation {
   telefono: string | null = null;
   cordenadas: string | null = null;
   cordenadas_gps: string | null = null;
+  cordenadas_utm: string | null = null;
   formatted_address: string | null = null;
   id_state: number | null = null;
   state: IState | null = null;
@@ -78,7 +81,7 @@ export class Station implements IStation {
   dispensers: IDispenser[] = [];
   created_at: string | null = null;
   updated_at: string | null = null;
-
+  current_verification: IVerification | null = null;
   constructor(data?: IStation) {
     if (data) {
       Object.assign(this, data);
@@ -90,6 +93,7 @@ export class Station implements IStation {
       ...this,
       id_state: this.state?.id,
       id_municipality: this.municipality?.id,
+      current_verification: this.current_verification ? new Verification(this.current_verification) : null
     };
   }
 }

@@ -6,7 +6,7 @@
           <div class="col-12 flex justify-end">
             <div class="row justify-end q-col-gutter-md">
               <div class="col-12 col-sm-auto flex justify-end">
-                <q-btn-group v-bind="$theme.btn">
+                <!-- <q-btn-group v-bind="$theme.btn">
                   <q-btn
                     v-bind="$theme.btn"
                     :class="{
@@ -27,7 +27,7 @@
                     icon="sym_o_grid_view"
                     @click="stationStore.grid = true"
                   />
-                </q-btn-group>
+                </q-btn-group> -->
               </div>
               <div class="col-12 col-sm-auto flex justify-end">
                 <q-btn
@@ -49,7 +49,6 @@
             label="Busca por nombre o CRE"
             clearable
             debounce="1000"
-            @update:model-value="handleUpdateTable"
             v-model="stationStore.search"
           >
             <template #append>
@@ -68,7 +67,6 @@
             @update:model-value="
               () => {
                 stationStore.municipality = null;
-                handleUpdateTable();
               }
             "
           >
@@ -81,9 +79,9 @@
             clearable
             :url="`/utils/municipalities/${stationStore.state?.id ?? ''}`"
             option-label="nombre"
+            :block-fetch="!stationStore.state"
             v-model="stationStore.municipality"
             :disable="!stationStore.state"
-            @update:model-value="handleUpdateTable()"
           >
           </q-fetch-select>
           <div class="col-3 flex justify-end"></div>
@@ -113,7 +111,12 @@
             <q-btn outline v-bind="$theme.btnIcon" icon="sym_o_more_vert" flat>
               <q-menu v-bind="$theme.menu">
                 <q-list>
-                  <q-item clickable v-ripple>
+                  <q-item
+                    clickable
+                    v-ripple
+                    v-if="!props.row.current_verification"
+                    @click="handleCreateVerification(props.row.id)"
+                  >
                     <q-item-section avatar>
                       <q-icon name="sym_o_add_notes"></q-icon>
                     </q-item-section>
@@ -174,7 +177,7 @@
         <template v-slot:item="props">
           <div class="q-pa-xs col-xs-12 col-sm-6 col-md-4 col-lg-3">
             <q-card v-bind="$theme.card" class="station-card">
-              <q-card-section class="station-card__hero bg-grey-4">
+              <q-card-section class="station-card__hero ">
                 <div class="row items-start no-wrap q-col-gutter-xs">
                   <div class="col">
                     <div
@@ -188,57 +191,18 @@
                     </div>
                     <div class="station-card__location">
                       <q-icon name="sym_o_location_on" size="18px" />
-                      <span
-                        >{{ props.row.municipality.nombre }},
-                        {{ props.row.state.nombre }}</span
-                      >
+                      <span>
+                        {{ props.row.municipality.nombre }},
+                        {{ props.row.state.nombre }}
+                      </span>
                     </div>
-                  </div>
-                  <div class="col-auto">
-                    <q-btn
-                      v-bind="$theme.btnIcon"
-                      flat
-                      dense
-                      icon="sym_o_more_vert"
-                    >
-                      <q-menu v-bind="$theme.menu">
-                        <q-list>
-                          <q-item
-                            clickable
-                            v-ripple
-                            :to="`/estaciones/editar/${props.row.id}`"
-                          >
-                            <q-item-section avatar>
-                              <q-icon name="sym_o_edit_square"></q-icon>
-                            </q-item-section>
-                            <q-item-section>
-                              <q-item-label>Editar estación</q-item-label>
-                            </q-item-section>
-                          </q-item>
-                          <q-item
-                            clickable
-                            v-ripple
-                            :to="`/estaciones/dispensarios/${props.row.id}`"
-                          >
-                            <q-item-section avatar>
-                              <q-icon name="sym_o_local_gas_station"></q-icon>
-                            </q-item-section>
-                            <q-item-section>
-                              <q-item-label>
-                                Configurar dispensarios
-                              </q-item-label>
-                            </q-item-section>
-                          </q-item>
-                        </q-list>
-                      </q-menu>
-                    </q-btn>
                   </div>
                 </div>
               </q-card-section>
-
+              <q-separator></q-separator>
               <q-card-section class="q-pt-md">
                 <div class="station-card__info-list">
-                  <q-item class="full-width bg-grey-4 border-md-radius">
+                  <q-item class="full-width bg-grey-2 border-md-radius">
                     <q-item-section
                       avatar
                       class="q-pa-none"
@@ -261,7 +225,7 @@
                     </q-item-section>
                   </q-item>
 
-                  <q-item class="full-width bg-grey-4 border-md-radius">
+                  <q-item class="full-width bg-grey-2 border-md-radius">
                     <q-item-section
                       avatar
                       class="q-pa-none"
@@ -288,17 +252,77 @@
                     </q-item-section>
                   </q-item>
                 </div>
+                <div class="row q-mt-md q-col-gutter-x-md">
+                  <div class="col-6">
+                    <q-btn
+                      v-bind="$theme.btn"
+                      class="full-width"
+                      color="grey-2"
+                      text-color="primary"
+                      :to="`/estaciones/editar/${props.row.id}`"
+                    >
+                      <div class="flex column items-center">
+                        <q-icon name="sym_o_edit_square"></q-icon>
+                        <span>Editar</span>
+                      </div>
+                    </q-btn>
+                  </div>
+                  <div class="col-6">
+                    <q-btn
+                      v-bind="$theme.btn"
+                      class="full-width"
+                      color="grey-2"
+                      text-color="primary"
+                      :to="`/estaciones/dispensarios/${props.row.id}`"
+                    >
+                      <div class="flex column items-center">
+                        <q-icon name="sym_o_local_gas_station"></q-icon>
+                        <span>Dispensarios</span>
+                      </div>
+                    </q-btn>
+                  </div>
+                </div>
               </q-card-section>
 
               <q-separator />
 
               <q-card-section class="station-card__footer">
-                <div class="station-card__verification">
+                <div class="station-card__verification" v-if="props.row.current_verification">
                   <q-icon name="sym_o_fact_check" size="22px" color="primary" />
                   <div>
-                    <div class="station-card__label">Última verificación</div>
+                    <div class="station-card__label">
+                      <span>
+                        Verificación en curso
+                      </span>
+                      <q-chip
+                        v-if="props.row.current_verification.estatus"
+                        v-bind="verificationStatusChip(props.row.current_verification.estatus)"
+                        dense
+                        square
+                        class="q-ma-none"
+                      ></q-chip>
+                    </div>
+                    <div class="station-card__value station-card__verification-header">
+                      <span>
+                        {{ props.row.current_verification.folio || "Sin folio" }}
+                      </span>
+                      <div class="station-card__hint">
+                        Fecha de solicitud:
+                        {{
+                          props.row.current_verification.fecha_solicitud
+                            ? $filters.date(props.row.current_verification.fecha_solicitud)
+                            : "Sin fecha"
+                        }}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="station-card__verification" v-else>
+                  <q-icon name="sym_o_fact_check" size="22px" color="primary" />
+                  <div>
+                    <div class="station-card__label">Verificación en curso</div>
                     <div class="station-card__value">
-                      Sin registro disponible
+                      Sin solicitud en curso
                     </div>
                     <div class="station-card__hint">
                       Crea una solicitud para comenzar el seguimiento de esta
@@ -308,12 +332,25 @@
                 </div>
 
                 <q-btn
+                  v-if="!props.row.current_verification"
                   v-bind="$theme.btn"
+                  @click="handleCreateVerification(props.row.id)"
                   icon="sym_o_add_notes"
                   color="primary"
                   text-color="secondary"
                   class="full-width station-card__action"
                   label="Crear solicitud"
+                >
+                </q-btn>
+                <q-btn
+                  v-else
+                  v-bind="$theme.btn"
+                  :to="`/verificaciones/${props.row.current_verification.id}`"
+                  icon="sym_o_fact_check"
+                  color="primary"
+                  text-color="secondary"
+                  class="full-width station-card__action"
+                  label="Ver solicitud"
                 >
                 </q-btn>
               </q-card-section>
@@ -330,11 +367,14 @@
 import QTableComponent from "src/components/QTableComponent.vue";
 import { useStation } from "src/stores/station-store";
 import type { IStation } from "src/types/IStation";
-import { computed, ref } from "vue";
+import { verificationStatusChip } from "src/types/IVerification";
+import { computed, ref, watch } from "vue";
 import PreCreacionEstacionDialog from "src/pages/estaciones/components/PreCreacionEstacionDialog.vue";
 import QFetchSelect from "src/components/QFetchSelect.vue";
-import { nextTick } from "vue";
+import { alert, question } from "src/config/dialog";
+import { useRouter } from "vue-router";
 const stationTableRef = ref<{ refresh: () => void } | null>(null);
+const router = useRouter();
 const pagination = ref({
   page: 1,
   rowsPerPage: 12,
@@ -409,10 +449,33 @@ const columns = [
 
 const stationStore = useStation();
 
-async function handleUpdateTable() {
-  await nextTick();
-  stationTableRef.value?.refresh();
+async function handleCreateVerification(stationId: number) {
+  const answer = await question(
+    "Crear solicitud",
+    "¿Seguro que deseas crear una solicitud de verificación para la estación seleccionada?",
+    {
+      type: "info",
+    },
+  );
+  if (!answer) return;
+  const { error, message, data } = await stationStore.creteVerification(stationId);
+  if (error) {
+    void alert("Error", message, {
+      type: "negative",
+    });
+    return;
+  } else {
+    void router.push(`/verificaciones/${data?.id}`);
+  }
 }
+
+watch(
+  tableRequestData,
+  () => {
+    stationTableRef.value?.refresh();
+  },
+  { flush: "post" },
+);
 </script>
 
 <style scoped lang="scss">
@@ -429,7 +492,6 @@ async function handleUpdateTable() {
 }
 
 .station-card:hover {
-  transform: translateY(-2px);
   box-shadow: 0 12px 28px rgba(15, 23, 42, 0.12);
 }
 
@@ -497,15 +559,24 @@ async function handleUpdateTable() {
   margin-bottom: 4px;
   font-size: 0.76rem;
   font-weight: 700;
-  letter-spacing: 0.04em;
   text-transform: uppercase;
-  color: rgba(15, 23, 42, 0.54);
+  display: flex;
+  justify-content: space-between;
 }
 
 .station-card__value {
   color: #132238;
   line-height: 1.4;
   word-break: break-word;
+}
+
+.station-card__verification-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  flex-wrap: wrap;
+  font-weight: 600;
 }
 
 .station-card__tags {

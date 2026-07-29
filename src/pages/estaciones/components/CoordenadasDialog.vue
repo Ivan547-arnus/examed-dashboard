@@ -142,8 +142,7 @@ function normalizeCoords() {
       const utmProj = `+proj=utm +zone=${zone} +${hemisphere === "N" ? "north" : "south"} +ellps=WGS84 +datum=WGS84 +units=m +no_defs`;
       const wgs84 = "+proj=longlat +datum=WGS84 +no_defs";
       const coords = proj4(utmProj, wgs84, [Number(easting), Number(northing)]);
-      console.log(coords);
-      emit("submit", [Number(coords[1]), Number(coords[0])]);
+      emit("submit", [Number(coords[1]), Number(coords[0])], state.utm);
       model.value = false;
     } else {
       if (

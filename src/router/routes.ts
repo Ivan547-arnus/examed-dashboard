@@ -158,6 +158,42 @@ const routes: RouteRecordRaw[] = [
     ],
   },
   {
+    path: "/verificaciones",
+    meta: {
+      title: "Verificaciones",
+    },
+    component: () => import("layouts/MainLayout.vue"),
+    children: [
+      {
+        name: "Historial de verificaciones",
+        path: "",
+        meta: {
+          title: "Historial de verificaciones",
+          auth: true,
+        },
+        component: () => import("pages/verificaciones/HistorialVerificacionesPage.vue"),
+      },
+      {
+        name: "Nueva verificación",
+        path: "nueva",
+        meta: {
+          title: "Nueva verificación",
+          auth: true,
+        },
+        component: () => import("pages/verificaciones/NuevaVerificacionPage.vue"),
+      },
+      {
+        name: "Verificación",
+        path: ":verificationId",
+        meta: {
+          title: "Verificación",
+          auth: true,
+        },
+        component: () => import("pages/verificaciones/VerificacionPage.vue"),
+      },
+    ],
+  },
+  {
     path: "/auth",
     meta: {
       title: "Autenticación",
