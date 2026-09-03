@@ -7,7 +7,7 @@
             <div class="col-12 col-sm-6 col-md">
               <q-card v-bind="$theme.card" class="bg-primary full-width full-height">
                 <q-card-section>
-                  <q-item>
+                  <q-item class="q-pa-none">
                     <q-item-section avatar>
                       <q-avatar
                         v-bind="$theme.avatar"
@@ -31,7 +31,7 @@
             <div class="col-12 col-sm-6 col-md">
               <q-card v-bind="$theme.card" class="bg-primary full-width full-height">
                 <q-card-section>
-                  <q-item>
+                  <q-item class="q-pa-none">
                     <q-item-section avatar>
                       <q-avatar
                         v-bind="$theme.avatar"
@@ -55,7 +55,7 @@
             <div class="col-12 col-sm-6 col-md">
               <q-card v-bind="$theme.card" class="bg-primary full-width full-height">
                 <q-card-section>
-                  <q-item>
+                  <q-item class="q-pa-none">
                     <q-item-section avatar>
                       <q-avatar
                         v-bind="$theme.avatar"
@@ -79,7 +79,7 @@
             <div class="col-12 col-sm-6 col-md">
               <q-card v-bind="$theme.card" class="bg-primary full-width full-height">
                 <q-card-section>
-                  <q-item>
+                  <q-item class="q-pa-none">
                     <q-item-section avatar>
                       <q-avatar
                         v-bind="$theme.avatar"
@@ -103,7 +103,7 @@
             <div class="col-12 col-sm-6 col-md">
               <q-card v-bind="$theme.card" class="bg-primary full-width full-height">
                 <q-card-section>
-                  <q-item>
+                  <q-item class="q-pa-none">
                     <q-item-section avatar>
                       <q-avatar
                         v-bind="$theme.avatar"
@@ -139,6 +139,14 @@
               no-caps
               shrink
             >
+              <q-tab
+                name="summary"
+                icon="sym_o_verified"
+                label="Resumen"
+                class="border-md-radius q-px-md"
+                style="width: 220px"
+                v-if="verificationStore.verificacion?.estatus !== 'Borrador'"
+              ></q-tab>
               <q-tab
                 name="station"
                 icon="sym_o_local_gas_station"
@@ -180,6 +188,9 @@
         <q-tab-panel name="confirm" class="q-pa-md">
           <VerificacionConfirmacionComponent />
         </q-tab-panel>
+        <q-tab-panel name="summary" class="q-pa-md">
+          <VerificacionSummaryComponent />
+        </q-tab-panel>
       </q-tab-panels>
     </div>
   </q-page>
@@ -190,6 +201,7 @@ import { useVerificacion } from "src/stores/verificacion-store";
 import VerificacionEstacionComponent from "src/pages/verificaciones/components/VerificacionEstacionComponent.vue";
 import VerificacionConfiguracionSolicitudComponent from "src/pages/verificaciones/components/VerificacionConfiguracionSolicitudComponent.vue";
 import VerificacionConfirmacionComponent from "src/pages/verificaciones/components/VerificacionConfirmacionComponent.vue";
+import VerificacionSummaryComponent from "src/pages/verificaciones/components/VerificacionSummaryComponent.vue";
 import { onMounted } from "vue";
 import { useRouter } from "vue-router";
 
@@ -197,6 +209,7 @@ const router = useRouter();
 const verificationStore = useVerificacion();
 
 onMounted(() => {
+  verificationStore.tab = "station";
   if (router.currentRoute.value.params.verificationId) {
     void verificationStore.get(
       Number(router.currentRoute.value.params.verificationId),

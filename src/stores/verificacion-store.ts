@@ -38,6 +38,9 @@ export const useVerificacion = defineStore('useVerificacion', {
           }
         }
         this.verificacion = new Verification(data)
+        if(this.verificacion.estatus !== 'Borrador') {
+          this.tab = 'summary'
+        }
         return {
           error: false,
           message: "Verificación obtenida correctamente",
@@ -93,12 +96,63 @@ export const useVerificacion = defineStore('useVerificacion', {
         };
       }
     },
+    async verifiersSnapshot() {
+      try {
+        const { data: { error, message } } = await make(
+          `/verifications/${this.verificacion.id}/verifiers-snapshot`,
+          "PUT",
+          null,
+          false,
+        );
+
+        return {
+          error,
+          message,
+        };
+      } catch (error) {
+        return {
+          error: true,
+          message: error instanceof Error ? error.message : String(error),
+        };
+      }
+    },
+    async updatePolicyData(stationDispenserId:number, prop:string, value:string | number){
+      try {
+        const { data: { error, message } } = await make(
+          `/verifications/${this.verificacion.id}/dispenser/${stationDispenserId}/update-policy-data`,
+          "PUT",
+          {
+            prop,
+            value
+          },
+          false,
+        );
+
+        return {
+          error,
+          message,
+        };
+      } catch (error) {
+        return {
+          error: true,
+          message: error instanceof Error ? error.message : String(error),
+        };
+      }
+    },
     async generateServiceRequestPDF() {
       const data = await file('/verifications/'+this.verificacion.id+'/service-request-pdf', 'GET', null, 'Generando PDF...');
       if (data.type == 'application/json') {
         void alert('Error al exportar', 'Ha ocurrido un error al exportar las asignaciones', { type: 'negative' })
       } else {
         utils.downloadBlob(data.data, 'solicitud-'+this.verificacion.folio, 'pdf')
+      }
+    },
+    async generateDictamenPDF() {
+      const data = await file('/verifications/'+this.verificacion.id+'/dictamen-pdf', 'GET', null, 'Generando PDF...');
+      if (data.type == 'application/json') {
+        void alert('Error al exportar', 'Ha ocurrido un error al exportar las asignaciones', { type: 'negative' })
+      } else {
+        utils.downloadBlob(data.data, 'dictamen-'+this.verificacion.folio, 'pdf')
       }
     }
   }

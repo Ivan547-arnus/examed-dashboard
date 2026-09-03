@@ -48,11 +48,17 @@ export function verificationStatusChip(estatus?: string | null) {
   );
 }
 
+export interface IPolicy {
+  id: number | null;
+  nombre: string | null;
+}
+
 export interface IStationVerificationDispenser {
   id: number | null;
   id_station_verification: number | null;
   id_station_dispenser: number | null;
   id_policy: number | null;
+  policy: IPolicy | null;
   "9_2_1": number | null;
   desperfectos_9_2: number | null;
   "7_2_4_y_7_2_4_2": number | null;
@@ -73,13 +79,39 @@ export interface IStationVerificationDispenser {
   deleted_at: string | null;
 }
 
+export interface IStationVerificationVerifierMaterial {
+  id: number | null;
+  id_station_verification: number | null;
+  id_station_verification_verifier: number | null;
+  tipo: "medida" | "termometro" | "cronometro" | "mesa-niveladora" | "embudo";
+  nombre: string | null;
+  informe: string | null;
+  marca: string | null;
+  modelo: string | null;
+  no_serie: string | null;
+  calibrado_por: string | null;
+  fecha_calibracion: string | null;
+  fecha_vencimiento: string | null;
+  created_at: string | null;
+  updated_at: string | null;
+  deleted_at: string | null;
+}
+
 export interface IStationVerificationVerifier {
   id: number | null;
   id_station_verification: number | null;
   id_verifier: number | null;
-  v20: number | null;
-  kc: number | null;
-  alpha: number | null;
+  v20: string | null;
+  kc: string | null;
+  alpha: string | null;
+  mesa_niveladora?: IStationVerificationVerifierMaterial | null;
+  medida?: IStationVerificationVerifierMaterial | null;
+  termometro?: IStationVerificationVerifierMaterial | null;
+  cronometro?: IStationVerificationVerifierMaterial | null;
+  embudo?: IStationVerificationVerifierMaterial | null;
+  created_at?: string | null;
+  updated_at?: string | null;
+  deleted_at?: string | null;
   verifier?: IUser | null;
 }
 
@@ -87,9 +119,17 @@ export class StationVerificationVerifier implements IStationVerificationVerifier
   id: number | null = null;
   id_station_verification: number | null = null;
   id_verifier: number | null = null;
-  v20: number | null = null;
-  kc: number | null = null;
-  alpha: number | null = null;
+  v20: string | null = null;
+  kc: string | null = null;
+  alpha: string | null = null;
+  mesa_niveladora?: IStationVerificationVerifierMaterial | null = null;
+  medida?: IStationVerificationVerifierMaterial | null = null;
+  termometro?: IStationVerificationVerifierMaterial | null = null;
+  cronometro?: IStationVerificationVerifierMaterial | null = null;
+  embudo?: IStationVerificationVerifierMaterial | null = null;
+  created_at?: string | null = null;
+  updated_at?: string | null = null;
+  deleted_at?: string | null = null;
   verifier?: IUser | null = null;
 
   constructor(data?: IStationVerificationVerifier) {
@@ -107,6 +147,7 @@ export class StationVerificationDispenser implements IStationVerificationDispens
   id_station_verification: number | null = null;
   id_station_dispenser: number | null = null;
   id_policy: number | null = null;
+  policy: IPolicy | null = null;
   "9_2_1": number | null = 0;
   desperfectos_9_2: number | null = 0;
   "7_2_4_y_7_2_4_2": number | null = 0;
